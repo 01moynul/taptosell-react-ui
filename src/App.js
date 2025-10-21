@@ -9,41 +9,55 @@ function App() {
   /**
    * This function is called when the button is clicked.
    */
-  const fetchCategories = () => {
+const fetchCategories = () => {
     console.log('Button clicked, attempting to fetch categories...');
     setIsLoading(true);
-    setApiResponse(''); // Clear previous response
+    setApiResponse('');
 
-    // This URL works because of the "proxy" we set in package.json.
-    // React's dev server sees this and forwards it to:
-    // http://localhost/taptosell.my/wp-json/taptosell/v1/product/categories
-    const apiUrl = '/wp-json/taptosell/v1/product/categories';
+    const apiUrl = 'http://localhost/taptosell.my/wp-json/taptosell/v1/product/categories';
 
-    fetch(apiUrl)
+    // --- NEW: Authentication using Application Password ---
+    // Replace with your WP username
+    const username = '01moynul'; 
+    // Replace with the Application Password you generated (keep the spaces!)
+    const appPassword = 'cdcB 77WT AYOD PLdd IPkz 7azB'; 
+
+    // Encode the username and password for the Authorization header
+    const basicAuth = btoa(`${username}:${appPassword}`); 
+    // --- END NEW AUTH ---
+
+    console.log(`Fetching from: ${apiUrl} using Basic Auth`); // Log for debugging
+
+    fetch(apiUrl, {
+      // We NO LONGER need credentials: 'include' when using Basic Auth
+      // credentials: 'include', 
+      headers: {
+        // --- UPDATED: Use Authorization Header ---
+        'Authorization': `Basic ${basicAuth}`
+        // --- END UPDATED ---
+      }
+    })
       .then(response => {
-        // We need to check if the response is OK (e.g., 200)
         if (!response.ok) {
-          // If we get a 401 or 403 error, response.json() will fail.
-          // So we read the error as text first.
+          // Try parsing the JSON error first
           return response.json().then(errorData => {
-            // Throw an error with the message from our API
-            throw new Error(`API Error (${response.status}): ${errorData.message}`);
+            // Include code in the error message for better debugging
+            throw new Error(`API Error (${response.status} - ${errorData.code}): ${errorData.message || 'Unknown error'}`);
+          }).catch(() => {
+             // If JSON parsing fails, throw a generic error
+             throw new Error(`API Error (${response.status}): ${response.statusText}`);
           });
         }
-        // If response is OK, parse it as JSON
         return response.json();
       })
       .then(data => {
-        // Data is the array of categories!
         console.log('Success:', data);
-        // We stringify the JSON to display it nicely in the <pre> tag
         setApiResponse(JSON.stringify(data, null, 2));
         setIsLoading(false);
       })
       .catch(error => {
-        // This will catch network errors or the error we threw
         console.error('Fetch Error:', error);
-        setApiResponse(error.message); // Show the error message
+        setApiResponse(error.message);
         setIsLoading(false);
       });
   };
