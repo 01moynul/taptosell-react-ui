@@ -309,6 +309,53 @@ function App() {
   };
 
   /**
+   * Handles the form submission.
+   * Gathers all state data and logs it to the console.
+   */
+  const handleSubmit = (event) => {
+    event.preventDefault(); // Prevent the default browser form submission
+
+    // --- Gather all the data from state into one object ---
+    const productData = {
+      // Basic Information
+      productName: productName,
+      selectedCategory: selectedCategory,
+      productDescription: productDescription,
+      brand: brand,
+      // NOTE: Images and Video are placeholders for now
+
+      // Sales Information (for simple product or base)
+      price: price,
+      sku: sku,
+      stock: stock,
+
+      // Variation Information
+      hasVariations: hasVariations,
+      // Only include variation details if variations are enabled
+      variationConfig: hasVariations ? variations : null,
+      variationDetails: hasVariations ? variationTableData : null,
+
+      // Shipping Information
+      weight: weight,
+      packageDimensions: {
+        length: pkgLength,
+        width: pkgWidth,
+        height: pkgHeight,
+      },
+    };
+
+    // --- Log the data to the console as a JSON string ---
+    console.log("Form Data Submitted (Client-Side):");
+    console.log(JSON.stringify(productData, null, 2)); // Pretty print JSON
+
+    // --- Next Step (Phase 14): ---
+    // Here, you would eventually make the fetch() POST request
+    // to your WordPress API endpoint ('/product/create')
+    // sending the 'productData' object.
+    alert('Check the console (F12) to see the gathered form data!');
+  };
+
+  /**
    * Adds a new, empty variation group
    * (Triggered by "+ Add Variation 2")
    */
@@ -749,6 +796,19 @@ function App() {
               </div>
             </div>
             {/* --- End Shipping Section --- */}
+
+            {/* --- Form Submission Button --- */}
+            <div className="form-section form-actions" style={{ textAlign: 'right', borderBottom: 'none', paddingBottom: 0 }}>
+              {/* Add other buttons like "Save as Draft" here later if needed */}
+              <button
+                type="button" // Use type="button" initially to prevent accidental default submission
+                onClick={handleSubmit} // Attach the handler here
+                className="button button-primary"
+              >
+                Save and Publish (Log Data)
+              </button>
+            </div>
+            {/* ---End Form Submission Button --- */}
 
           </form>
         </header> {/* <-- Note: The closing </header> tag is here */}
