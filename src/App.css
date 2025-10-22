@@ -283,3 +283,99 @@
 .add-product-form h1 {
     margin-bottom: 10px; /* Add some space between H1 and sticky nav */
 }
+
+/* --- Product Preview Component Styles --- */
+
+.product-preview-component h2 {
+  font-size: 1.1rem;
+  margin-top: 0;
+  text-align: center;
+  border-bottom: 1px solid #5d6472;
+  padding-bottom: 10px;
+  margin-bottom: 20px;
+}
+
+.preview-content {
+  text-align: center;
+}
+
+.preview-image-placeholder {
+  background-color: #555;
+  height: 250px; /* Make image placeholder larger */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 15px;
+  border-radius: 4px;
+  color: #aaa;
+}
+
+.preview-title {
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin-bottom: 10px;
+  min-height: 1.2em; /* Prevent layout shift when empty */
+  word-wrap: break-word; /* Wrap long titles */
+}
+
+.preview-price {
+  font-size: 1.4rem;
+  color: #ff6b6b; /* A highlight color for price */
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+.preview-price small {
+    font-size: 0.7em;
+    color: #ccc;
+    font-weight: normal;
+}
+
+
+.preview-stock {
+  font-size: 0.9rem;
+  color: #ccc;
+  margin-bottom: 20px;
+}
+
+.preview-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.preview-actions button {
+  flex: 1;
+  padding: 10px;
+  border: 1px solid #777;
+  background-color: transparent;
+  color: #ddd;
+  border-radius: 4px;
+  cursor: not-allowed; /* Indicate they are disabled */
+}
+
+.preview-actions button.buy-now {
+  background-color: #ff6b6b;
+  border-color: #ff6b6b;
+  color: white;
+}
+
+.preview-meta,
+.preview-description {
+    font-size: 0.9rem;
+    color: #ccc;
+    text-align: left;
+    margin-top: 20px;
+    padding-top: 15px;
+    border-top: 1px solid #5d6472;
+}
+.preview-meta p,
+.preview-description p {
+    margin-bottom: 5px;
+}
+.preview-description h4 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    font-size: 1rem;
+    color: white;
+}

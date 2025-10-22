@@ -1,37 +1,60 @@
 //
 // File: src/AddProductForm.js (Corrected Version)
 //
-import React from 'react';
+import React, { useEffect } from 'react'; // Import useEffect
 // We don't need useState or useEffect here, just 'React'
 // import './App.css'; // App.js already imports the CSS
 
 // Accept { categories } as a prop from App.js
-function AddProductForm({ categories }) {
-  
-  // --- State Variables (ALL form state lives here) ---
-  const [selectedCategory, setSelectedCategory] = React.useState('');
-  const [productName, setProductName] = React.useState('');
-  const [productDescription, setProductDescription] = React.useState('');
-  const [brand, setBrand] = React.useState('');
-  const [price, setPrice] = React.useState('');
-  const [sku, setSku] = React.useState('');
-  const [stock, setStock] = React.useState('');
-  const [hasVariations, setHasVariations] = React.useState(false);
-  const [variations, setVariations] = React.useState([]);
-  const [variationTableData, setVariationTableData] = React.useState([]);
-  const [weight, setWeight] = React.useState('');
-  const [pkgLength, setPkgLength] = React.useState('');
-  const [pkgWidth, setPkgWidth] = React.useState('');
-  const [pkgHeight, setPkgHeight] = React.useState('');
-  
-  // --- NEW State for active tab ---
-  const [activeSection, setActiveSection] = React.useState('basic-info-section');
+function AddProductForm({
+    // Props from App.js
+    categories,
 
+    // Basic Info State & Setters
+    productName,
+    setProductName,
+    selectedCategory,
+    setSelectedCategory,
+    productDescription,
+    setProductDescription,
+    brand,
+    setBrand,
+
+    // Sales Info State & Setters
+    price,
+    setPrice,
+    sku,
+    setSku,
+    stock,
+    setStock,
+
+    // Variations State & Setters
+    hasVariations,
+    setHasVariations,
+    variations,
+    setVariations,
+    variationTableData,
+    setVariationTableData,
+
+    // Shipping State & Setters
+    weight,
+    setWeight,
+    pkgLength,
+    setPkgLength,
+    pkgWidth,
+    setPkgWidth,
+    pkgHeight,
+    setPkgHeight,
+
+    // Navigation State & Setter
+    activeSection,
+    setActiveSection
+    }) {
   
   // --- Effect Hooks ---
 
   // Effect for syncing the variation table
-  React.useEffect(() => {
+  useEffect(() => {
     if (!hasVariations || variations.length === 0) {
       setVariationTableData([]); 
       return;
@@ -58,7 +81,7 @@ function AddProductForm({ categories }) {
 
   // --- NEW: Effect Hook for Intersection Observer (FIXED) ---
   // This is now at the top level of this component, so it's not conditional
-  React.useEffect(() => {
+  useEffect(() => {
     const sections = [
       document.getElementById('basic-info-section'),
       document.getElementById('sales-info-section'),

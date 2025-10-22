@@ -3,13 +3,33 @@
 //
 import React, { useState, useEffect } from 'react';
 import './App.css';
-import AddProductForm from './AddProductForm'; // Import the new component
+import AddProductForm from './AddProductForm';
+import ProductPreview from './ProductPreview'; 
 
 function App() {
   // --- State for API data and loading status ---
   const [categories, setCategories] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  // --- State Variables (ALL form state lives here) ---
+  const [selectedCategory, setSelectedCategory] = useState('');
+  const [productName, setProductName] = useState('');
+  const [productDescription, setProductDescription] = useState('');
+  const [brand, setBrand] = useState('');
+  const [price, setPrice] = useState('');
+  const [sku, setSku] = useState('');
+  const [stock, setStock] = useState('');
+  const [hasVariations, setHasVariations] = useState(false);
+  const [variations, setVariations] = useState([]);
+  const [variationTableData, setVariationTableData] = useState([]);
+  const [weight, setWeight] = useState('');
+  const [pkgLength, setPkgLength] = useState('');
+  const [pkgWidth, setPkgWidth] = useState('');
+  const [pkgHeight, setPkgHeight] = useState('');
+  
+  // --- NEW State for active tab ---
+  const [activeSection, setActiveSection] = useState('basic-info-section');
 
   /**
    * useEffect Hook to fetch categories - kept in App.js
@@ -92,22 +112,68 @@ function App() {
 
         {/* --- Column 2: Add Product Form --- */}
         <div className="layout-column form-column">
-          {/* Render the AddProductForm component, passing categories as a prop */}
+          {/* Render the AddProductForm component, passing ALL state and setters */}
           <AddProductForm
+            // Pass categories (already doing this)
             categories={categories}
+
+            // --- Pass Basic Info State & Setters ---
+            productName={productName}
+            setProductName={setProductName}
+            selectedCategory={selectedCategory}
+            setSelectedCategory={setSelectedCategory}
+            productDescription={productDescription}
+            setProductDescription={setProductDescription}
+            brand={brand}
+            setBrand={setBrand}
+
+            // --- Pass Sales Info State & Setters ---
+            price={price}
+            setPrice={setPrice}
+            sku={sku}
+            setSku={setSku}
+            stock={stock}
+            setStock={setStock}
+
+            // --- Pass Variations State & Setters ---
+            hasVariations={hasVariations}
+            setHasVariations={setHasVariations}
+            variations={variations}
+            setVariations={setVariations}
+            variationTableData={variationTableData}
+            setVariationTableData={setVariationTableData}
+
+            // --- Pass Shipping State & Setters ---
+            weight={weight}
+            setWeight={setWeight}
+            pkgLength={pkgLength}
+            setPkgLength={setPkgLength}
+            pkgWidth={pkgWidth}
+            setPkgWidth={setPkgWidth}
+            pkgHeight={pkgHeight}
+            setPkgHeight={setPkgHeight}
+
+            // --- Pass Navigation State & Setter ---
+            activeSection={activeSection}
+            setActiveSection={setActiveSection}
           />
         </div>
 
-        {/* --- Column 3: Product Preview (Placeholder) --- */}
+        {/* --- Column 3: Live Product Preview --- */}
         <div className="layout-column preview-column">
-          <h2>Preview</h2>
-          <div className="preview-content">
-            <div className="preview-image-placeholder">[Image Placeholder]</div>
-            <p className="preview-title-placeholder">[Product Title]</p>
-            <p className="preview-price-placeholder">[Price]</p>
-            <button disabled>Buy Now</button>
-            <p><small>This is for reference only.</small></p>
-          </div>
+          {/* Render the ProductPreview component, passing down the relevant state */}
+          <ProductPreview
+            productName={productName}
+            price={price}
+            stock={stock}
+            hasVariations={hasVariations}
+            variationTableData={variationTableData}
+            // Pass other needed props
+            productDescription={productDescription}
+            brand={brand}
+            selectedCategory={selectedCategory}
+            categories={categories} // Pass the category list for name lookup
+          />
         </div>
 
       </div> {/* End add-product-layout-container */}
