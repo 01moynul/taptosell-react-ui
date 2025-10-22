@@ -254,6 +254,41 @@ function App() {
   };
 
   /**
+   * Removes a specific option (e.g., "Red") from a specific variation group
+   */
+  const handleRemoveOption = (groupIndex, optionIndex) => {
+    setVariations(prevVariations => {
+      // Create a deep copy
+      const newVariations = JSON.parse(JSON.stringify(prevVariations));
+      
+      // Find the specific group
+      const group = newVariations[groupIndex];
+      
+      // Remove the option at the specific index
+      if (group && group.options) {
+        group.options.splice(optionIndex, 1); // Mutate the copy
+      }
+      
+      return newVariations; // Return the updated state
+    });
+  };
+
+  /**
+   * Removes an entire variation group (e.g., "Color")
+   */
+  const handleRemoveGroup = (groupIndex) => {
+    setVariations(prevVariations => {
+      // Create a copy
+      const newVariations = [...prevVariations];
+      
+      // Remove the group at the specified index
+      newVariations.splice(groupIndex, 1); // Mutate the copy
+      
+      return newVariations; // Return the updated state
+    });
+  };
+
+  /**
    * Handles changes to the inputs within the variation list table
    */
   const handleTableInputChange = (event, rowIndex, fieldName) => {
@@ -463,7 +498,16 @@ function App() {
                           />
                         )}
                         
-                        <button type="button" className="button-icon remove-variation-group" title="Remove Variation Group">&times;</button>
+                        {/* --- THIS IS THE LINE TO UPDATE --- */}
+                        <button 
+                          type="button" 
+                          className="button-icon remove-variation-group" 
+                          title="Remove Variation Group"
+                          onClick={() => handleRemoveGroup(index)}
+                        >
+                          &times;
+                        </button>
+                        
                       </div>
 
                       {/* === Conditional Size Format Group === */}
@@ -526,7 +570,7 @@ function App() {
                             {group.options.map((option, optionIndex) => (
                               <div key={optionIndex} className="variation-option-item">
                                 <span>{option}</span>
-                                {/* <button type="button" onClick={() => handleRemoveOption(index, optionIndex)}>&times;</button> */}
+                                 <button type="button" onClick={() => handleRemoveOption(index, optionIndex)}>&times;</button>
                               </div>
                             ))}
                           </div>
