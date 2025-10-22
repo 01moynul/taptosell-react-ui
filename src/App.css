@@ -3,7 +3,7 @@
  */
 
 .App {
-  text-align: center;
+  /* text-align: center; <-- REMOVE this line */
 }
 
 .App-header {
@@ -11,9 +11,11 @@
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: flex-start; /* Aligns content to the top */
-  padding-top: 40px; /* Add some padding at the top */
+  /* align-items: center; <-- CHANGE this */
+  align-items: stretch; /* <-- TO THIS: Allows children to stretch full width */
+  justify-content: flex-start;
+  /* padding-top: 40px; <-- REMOVE this line or set to 0 */
+  padding-top: 0; /* Ensures container starts at the top */
   font-size: calc(10px + 2vmin);
   color: white;
 }
@@ -85,4 +87,144 @@
 .form-group option {
   background-color: #3a3f4a;
   color: white;
+}
+
+/* --- Shopee 3-Column Layout Styles --- */
+
+.add-product-layout-container {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 20px; /* Keep padding for internal spacing */
+  width: 100%; /* Ensure it tries to take full width */
+  /* max-width: 1400px; <-- REMOVE this line */
+  /* margin: 0 auto; <-- REMOVE this line */
+  box-sizing: border-box; /* Include padding in the 100% width calculation */
+  align-items: flex-start;
+  background-color: #282c34; /* Match header background */
+  color: white;
+}
+
+.layout-column {
+  background-color: #3a3f4a; /* Slightly lighter background for columns */
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* Specific column widths (REVISED) */
+.suggestions-column {
+  flex: 0 0 250px; /* No grow, No shrink, Fixed base width */
+  /* min-width: 200px; <-- Can remove or keep this */
+}
+
+.form-column {
+  flex: 1 1 auto; /* Grow (1), Shrink (1), Base width is automatic */
+  min-width: 0; /* Allows the middle column to shrink properly if needed */
+  /* Remove flex-basis percentage */
+}
+
+.preview-column {
+  flex: 0 0 300px; /* No grow, No shrink, Fixed base width */
+  /* min-width: 250px; <-- Can remove or keep this */
+}
+
+/* Adjustments for the form now inside a column */
+.form-column .add-product-form {
+  max-width: none; /* Allow form to fill the column */
+  width: 100%;
+  padding: 0; /* Remove padding, column has padding */
+  box-shadow: none; /* Remove shadow, column has shadow */
+  background-color: transparent; /* Make form background transparent */
+  border-radius: 0; /* Remove form radius */
+  color: white; /* Ensure form text is white */
+}
+
+/* Ensure form elements inherit color */
+.form-column .add-product-form label,
+.form-column .add-product-form h1,
+.form-column .add-product-form h2 {
+  color: white; /* Or a lighter color like #e0e0e0 */
+}
+.form-column .add-product-form h2 {
+    color: #a9c1ff; /* Keep specific heading color */
+}
+
+/* Placeholder styling */
+.suggestions-column ul {
+  list-style: none;
+  padding: 0;
+}
+.suggestions-column li {
+  margin-bottom: 8px;
+  color: #ccc;
+}
+.suggestions-column li::before {
+  margin-right: 8px;
+}
+.suggestions-column li:first-child::before { content: '✅'; } /* Example */
+.suggestions-column li:nth-child(2)::before { content: '⬜️'; } /* Example */
+.suggestions-column h2 {
+  font-size: 1.1rem;
+  margin-top: 0;
+}
+
+.preview-column h2 {
+  font-size: 1.1rem;
+  margin-top: 0;
+  text-align: center;
+}
+.preview-content {
+  text-align: center;
+}
+.preview-image-placeholder {
+  background-color: #555;
+  height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 15px;
+  border-radius: 4px;
+}
+.preview-title-placeholder,
+.preview-price-placeholder {
+  background-color: #555;
+  height: 20px;
+  margin-bottom: 10px;
+  border-radius: 4px;
+}
+.preview-column button {
+  width: 100%;
+  padding: 10px;
+  margin-top: 15px;
+  background-color: #ccc;
+  border: none;
+  border-radius: 4px;
+  color: #666;
+}
+
+.error-message {
+    color: #f8d7da; /* Light red for errors */
+    background-color: #721c24; /* Dark red background */
+    padding: 15px;
+    border-radius: 5px;
+    border: 1px solid #f5c6cb;
+}
+
+/* Responsive adjustments if needed */
+@media (max-width: 992px) {
+  .add-product-layout-container {
+    flex-direction: column;
+    align-items: stretch; /* Stretch columns to full width */
+  }
+  .suggestions-column,
+  .preview-column {
+    flex-basis: auto; /* Allow columns to stack */
+    width: 100%;
+    margin-bottom: 20px;
+  }
+   .form-column {
+     flex-basis: auto;
+     width: 100%;
+   }
 }
