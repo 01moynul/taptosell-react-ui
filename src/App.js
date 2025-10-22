@@ -1,5 +1,5 @@
 //
-// File: src/App.js
+// File: src/App.js (Corrected Version)
 //
 import React, { useState, useEffect } from 'react';
 import './App.css';
@@ -31,10 +31,14 @@ function App() {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
         const data = await response.json();
-        // --- IMPORTANT: Ensure data format matches what AddProductForm expects ---
-        // The API returns { id: term_id, name: '...', slug: '...' }
-        // Let's keep this format as it's good practice to use 'id'
-        setCategories(data); // Assuming API returns [{id: 1, name: 'T-Shirts'}, ...]
+        
+        // API returns [{term_id: 1, name: '...'}, ...]
+        // Let's transform it to the format our form expects {id: 1, name: '...'}
+        const formattedCategories = data.map(category => ({
+          id: category.term_id, // Use 'id'
+          name: category.name
+        }));
+        setCategories(formattedCategories);
 
       } catch (e) {
         console.error("Error fetching categories:", e);
@@ -59,7 +63,10 @@ function App() {
   if (error) {
     return (
       <div className="App">
-        <div className="add-product-layout-container error-message">Error: {error}</div>
+        <div className="add-product-layout-container error-message">
+          <p>Error: {error}</p>
+          <p>Please check your WP username and Application Password in src/App.js and ensure your local WordPress site is running.</p>
+        </div>
       </div>
     );
   }
@@ -67,19 +74,17 @@ function App() {
   // --- Main 3-Column Layout ---
   return (
     <div className="App">
-      {/* Container for the 3-column Shopee-like layout */}
+      {/* Container for the 3-column Add Product layout */}
       <div className="add-product-layout-container">
 
         {/* --- Column 1: Filing Suggestions (Placeholder) --- */}
         <div className="layout-column suggestions-column">
           <h2>Filing Suggestions</h2>
-          {/* Static content for now */}
           <ul>
             <li>✅ Add at least 3 images</li>
             <li>⬜️ Add video</li>
             <li>✅ Add characters for name to 25~100</li>
             <li>⬜️ Add at least 100 characters or 1 image for description</li>
-            {/* ... other suggestions */}
           </ul>
            <h2>Tips</h2>
            <p>Variation: Add up to 2 tiers...</p>
@@ -87,11 +92,9 @@ function App() {
 
         {/* --- Column 2: Add Product Form --- */}
         <div className="layout-column form-column">
-          {/* Render the AddProductForm component, passing necessary props */}
+          {/* Render the AddProductForm component, passing categories as a prop */}
           <AddProductForm
             categories={categories}
-            isLoading={isLoading} // Pass loading/error to potentially disable form later
-            error={error}
           />
         </div>
 
@@ -99,7 +102,6 @@ function App() {
         <div className="layout-column preview-column">
           <h2>Preview</h2>
           <div className="preview-content">
-            {/* Static placeholder content */}
             <div className="preview-image-placeholder">[Image Placeholder]</div>
             <p className="preview-title-placeholder">[Product Title]</p>
             <p className="preview-price-placeholder">[Price]</p>

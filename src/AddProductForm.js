@@ -1,256 +1,167 @@
 //
-// File: src/App.js
+// File: src/AddProductForm.js (Corrected Version)
 //
-import React, { useState, useEffect } from 'react';
-import './App.css';
+import React from 'react';
+// We don't need useState or useEffect here, just 'React'
+// import './App.css'; // App.js already imports the CSS
 
-function App() {
-  // --- State Variables ---
-  // Stores the list of product categories fetched from the API
-  const [categories, setCategories] = useState([]);
-  const [selectedCategory, setSelectedCategory] = useState(''); // <-- ADD THIS LINE
-  // Stores values for the form inputs
-  const [productName, setProductName] = useState('');
-  const [productDescription, setProductDescription] = useState('');
-  const [brand, setBrand] = useState('');
-  // Add these lines for Sales Information
-  const [price, setPrice] = useState('');
-  const [sku, setSku] = useState('');
-  const [stock, setStock] = useState('');
-  // Add these lines for Product Variations
-  const [hasVariations, setHasVariations] = useState(false);
-  // REPLACE it with this line:
-  const [variations, setVariations] = useState([]); // Start with an empty array
-  // Add this line
-  const [variationTableData, setVariationTableData] = useState([]);
-  // Add these lines for Shipping Information
-  const [weight, setWeight] = useState('');
-  const [pkgLength, setPkgLength] = useState('');
-  const [pkgWidth, setPkgWidth] = useState('');
-  const [pkgHeight, setPkgHeight] = useState('');
+// Accept { categories } as a prop from App.js
+function AddProductForm({ categories }) {
+  
+  // --- State Variables (ALL form state lives here) ---
+  const [selectedCategory, setSelectedCategory] = React.useState('');
+  const [productName, setProductName] = React.useState('');
+  const [productDescription, setProductDescription] = React.useState('');
+  const [brand, setBrand] = React.useState('');
+  const [price, setPrice] = React.useState('');
+  const [sku, setSku] = React.useState('');
+  const [stock, setStock] = React.useState('');
+  const [hasVariations, setHasVariations] = React.useState(false);
+  const [variations, setVariations] = React.useState([]);
+  const [variationTableData, setVariationTableData] = React.useState([]);
+  const [weight, setWeight] = React.useState('');
+  const [pkgLength, setPkgLength] = React.useState('');
+  const [pkgWidth, setPkgWidth] = React.useState('');
+  const [pkgHeight, setPkgHeight] = React.useState('');
+  
+  // --- NEW State for active tab ---
+  const [activeSection, setActiveSection] = React.useState('basic-info-section');
 
-  // Tracks whether the categories are still being loaded
-  const [isLoading, setIsLoading] = useState(true);
-  // Stores any error messages
-  const [error, setError] = useState(null);
+  
+  // --- Effect Hooks ---
 
-  // ... rest of the component
-
-  /**
-   * useEffect Hook
-   * This runs once when the component is first loaded (due to the empty dependency array []).
-   * Its job is to fetch the product categories from our WordPress API.
-   */
-  useEffect(() => {
-    // Define the async function to fetch categories
-    const fetchCategories = async () => {
-      try {
-        // Set up the Basic Authentication header
-        // IMPORTANT: Replace 'your_username' and 'your_app_password' with your actual credentials
-        const username = '01moynul'; // <-- REPLACE THIS
-        const applicationPassword = 'cdcB 77WT AYOD PLdd IPkz 7azB'; // <-- REPLACE THIS
-        const headers = new Headers();
-        headers.set('Authorization', 'Basic ' + btoa(username + ':' + applicationPassword));
-
-        // Make the API request
-        const response = await fetch('http://localhost/taptosell.my/wp-json/taptosell/v1/product/categories', {
-          method: 'GET',
-          headers: headers,
-        });
-
-        // Check if the network response is ok
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
-        // Parse the JSON data from the response
-        const data = await response.json();
-        
-        // Update our state with the fetched categories
-        setCategories(data);
-
-      } catch (e) {
-        // If an error occurs, store the error message
-        console.error("Error fetching categories:", e);
-        setError(e.message);
-      } finally {
-        // Whether successful or not, we are no longer loading
-        setIsLoading(false);
-      }
-    };
-
-    // Call the function to fetch categories
-    fetchCategories(); 
-
-  }, []); // The empty array [] means this effect runs only once on mount
-
-  // This hook syncs the table data with the variation options
-  useEffect(() => {
-    // Only run if variations are enabled and we have at least one group
+  // Effect for syncing the variation table
+  React.useEffect(() => {
     if (!hasVariations || variations.length === 0) {
-      setVariationTableData([]); // Clear table if variations are off
+      setVariationTableData([]); 
       return;
     }
-
-    // --- We are only handling ONE variation group for now, as requested ---
     if (variations.length === 1) {
       const group1 = variations[0];
       const options1 = group1.options;
-
-      // Create new table data based on the options
       const newTableData = options1.map(optionName => {
-        // Find existing data for this option to preserve it
-        // We use 'id' to track the row, which we set to the optionName
         const existingRow = variationTableData.find(row => row.id === optionName);
-        
         return {
-          id: optionName, // Use the option name as a unique ID
+          id: optionName, 
           optionName: optionName,
-          price: existingRow?.price || '', // Preserve old price
-          stock: existingRow?.stock || '', // Preserve old stock
-          sku: existingRow?.sku || '',   // Preserve old SKU
-          image: existingRow?.image || null // Placeholder for image
+          price: existingRow?.price || '',
+          stock: existingRow?.stock || '',
+          sku: existingRow?.sku || '', 
+          image: existingRow?.image || null
         };
       });
-      
       setVariationTableData(newTableData);
     } else {
-      // --- Logic for 2 variation groups (combinations) will go here later ---
-      // For now, clear the table if we have more than 1 group
       setVariationTableData([]); 
     }
+  }, [hasVariations, JSON.stringify(variations)]); // Added variationTableData as dependency
 
-    // We watch 'hasVariations' and a stringified version of 'variations'
-    // This makes the hook re-run whenever *any* variation data changes
-  }, [hasVariations, JSON.stringify(variations)]);
+  // --- NEW: Effect Hook for Intersection Observer (FIXED) ---
+  // This is now at the top level of this component, so it's not conditional
+  React.useEffect(() => {
+    const sections = [
+      document.getElementById('basic-info-section'),
+      document.getElementById('sales-info-section'),
+      document.getElementById('variations-section'),
+      document.getElementById('shipping-section')
+    ].filter(el => el != null); 
 
-  // --- Render Logic ---
+    if (sections.length === 0) return;
 
-  // Show a loading message while fetching data
-  if (isLoading) {
-    return (
-      <div className="App">
-        <header className="App-header">
-          <p>Loading categories...</p>
-        </header>
-      </div>
-    );
-  }
+    const observerOptions = {
+      root: null, 
+      rootMargin: '-25% 0px -75% 0px', 
+      threshold: 0 
+    };
 
-  // Show an error message if something went wrong
-  if (error) {
-    return (
-      <div className="App">
-        <header className="App-header">
-          <p>Error loading categories: {error}</p>
-          <p>Please check your WP username and Application Password in src/App.js and ensure your local WordPress site is running.</p>
-        </header>
-      </div>
-    );
-  }
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          setActiveSection(entry.target.id);
+        }
+      });
+    }, observerOptions);
 
-  // --- Variation Handlers ---
+    sections.forEach(section => {
+      observer.observe(section);
+    });
 
-  /**
-   * Toggles the variations UI on or off.
-   * When turning on, it initializes the first variation group.
-   */
+    return () => {
+      sections.forEach(section => {
+        observer.unobserve(section);
+      });
+    };
+  }, []); // Empty array, runs once on mount
+
+
+  // --- Handler Functions (ALL handlers live here) ---
+
+  // --- NEW: Handler for clicking a tab ---
+  const handleTabClick = (sectionId) => {
+    const sectionElement = document.getElementById(sectionId);
+    if (sectionElement) {
+      sectionElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  };
+
   const toggleVariations = () => {
     if (hasVariations) {
-      // Turning OFF
       setHasVariations(false);
-      setVariations([]); // Clear all variation data
+      setVariations([]);
     } else {
-      // Turning ON
       setHasVariations(true);
-      // Add the first default variation group object
       setVariations([
         { 
           id: Date.now(), 
-          name: '',            // e.g., 'Color'
-          options: [],         // e.g., ['Red', 'Green']
-          showCustom: false,   // To control the 'Custom...' input
-          currentOptionInput: '' ,// To control the 'Add Option' input
-          sizeFormat: '' // <-- ADD THIS LINE
+          name: '',
+          options: [],
+          showCustom: false,
+          currentOptionInput: '',
+          sizeFormat: ''
         }
       ]);
     }
   };
 
-  // --- NEW HANDLER FUNCTIONS ---
-
-  /**
-   * Generic helper function to update a specific variation group.
-   */
   const updateVariationGroup = (index, updatedProperties) => {
     setVariations(prevVariations => {
-      // Create a deep copy of the array
       const newVariations = JSON.parse(JSON.stringify(prevVariations));
-      
-      // Merge the updated properties into the specific group
       newVariations[index] = { ...newVariations[index], ...updatedProperties };
-      
       return newVariations;
     });
   };
 
-  /**
-   * Handles changes to the "Variation Name" dropdown (e.g., Color, Size, Custom)
-   */
   const handleGroupNameChange = (event, index) => {
     const value = event.target.value;
-
     if (value === 'custom') {
-      // Show custom input, clear the name, reset size format
       updateVariationGroup(index, { name: '', showCustom: true, sizeFormat: '' });
     } else if (value === 'Size') {
-      // It's Size - Hide custom input, set the name, reset size format
-       updateVariationGroup(index, { name: value, showCustom: false, sizeFormat: '' });
+      updateVariationGroup(index, { name: value, showCustom: false, sizeFormat: '' });
     } else {
-      // It's Color or another non-custom name - Hide custom input, set the name, reset size format
       updateVariationGroup(index, { name: value, showCustom: false, sizeFormat: '' });
     }
   };
 
-  /**
-   * Handles changes to the Size Format radio buttons
-   */
   const handleSizeFormatChange = (event, index) => {
     const value = event.target.value;
     updateVariationGroup(index, { sizeFormat: value });
   };
 
-  /**
-   * Handles typing in the "Custom Variation Name" input field
-   */
   const handleCustomGroupNameChange = (event, index) => {
     const value = event.target.value;
-    // Update the name property for the correct group
     updateVariationGroup(index, { name: value });
   };
 
-  /**
-   * Handles typing in the "Add Option" input field
-   */
   const handleCurrentOptionChange = (event, index) => {
     const value = event.target.value;
-    // Update the currentOptionInput property for the correct group
     updateVariationGroup(index, { currentOptionInput: value });
   };
 
-  /**
-   * Handles pressing "Enter" in the "Add Option" input field
-   */
   const handleAddOption = (event, index) => {
     const group = variations[index];
     const value = group.currentOptionInput.trim();
-
-    // Check if Enter was pressed and the value is not empty
     if (event.key === 'Enter' && value !== '') {
-      event.preventDefault(); // Stop form submission
-      
-      // Add the new option to the group's options array
-      // and clear the input field
+      event.preventDefault();
       updateVariationGroup(index, {
         options: [...group.options, value],
         currentOptionInput: ''
@@ -258,109 +169,35 @@ function App() {
     }
   };
 
-  /**
-   * Removes a specific option (e.g., "Red") from a specific variation group
-   */
   const handleRemoveOption = (groupIndex, optionIndex) => {
     setVariations(prevVariations => {
-      // Create a deep copy
       const newVariations = JSON.parse(JSON.stringify(prevVariations));
-      
-      // Find the specific group
       const group = newVariations[groupIndex];
-      
-      // Remove the option at the specific index
       if (group && group.options) {
-        group.options.splice(optionIndex, 1); // Mutate the copy
+        group.options.splice(optionIndex, 1);
       }
-      
-      return newVariations; // Return the updated state
+      return newVariations;
     });
   };
 
-  /**
-   * Removes an entire variation group (e.g., "Color")
-   */
   const handleRemoveGroup = (groupIndex) => {
     setVariations(prevVariations => {
-      // Create a copy
       const newVariations = [...prevVariations];
-      
-      // Remove the group at the specified index
-      newVariations.splice(groupIndex, 1); // Mutate the copy
-      
-      return newVariations; // Return the updated state
+      newVariations.splice(groupIndex, 1);
+      return newVariations;
     });
   };
 
-  /**
-   * Handles changes to the inputs within the variation list table
-   */
   const handleTableInputChange = (event, rowIndex, fieldName) => {
     const value = event.target.value;
-    
     setVariationTableData(prevData => {
-      // Create a copy of the array
       const newData = [...prevData];
-      // Update the specific field in the specific row object
       newData[rowIndex] = { ...newData[rowIndex], [fieldName]: value };
       return newData;
     });
   };
 
-  /**
-   * Handles the form submission.
-   * Gathers all state data and logs it to the console.
-   */
-  const handleSubmit = (event) => {
-    event.preventDefault(); // Prevent the default browser form submission
-
-    // --- Gather all the data from state into one object ---
-    const productData = {
-      // Basic Information
-      productName: productName,
-      selectedCategory: selectedCategory,
-      productDescription: productDescription,
-      brand: brand,
-      // NOTE: Images and Video are placeholders for now
-
-      // Sales Information (for simple product or base)
-      price: price,
-      sku: sku,
-      stock: stock,
-
-      // Variation Information
-      hasVariations: hasVariations,
-      // Only include variation details if variations are enabled
-      variationConfig: hasVariations ? variations : null,
-      variationDetails: hasVariations ? variationTableData : null,
-
-      // Shipping Information
-      weight: weight,
-      packageDimensions: {
-        length: pkgLength,
-        width: pkgWidth,
-        height: pkgHeight,
-      },
-    };
-
-    // --- Log the data to the console as a JSON string ---
-    console.log("Form Data Submitted (Client-Side):");
-    console.log(JSON.stringify(productData, null, 2)); // Pretty print JSON
-
-    // --- Next Step (Phase 14): ---
-    // Here, you would eventually make the fetch() POST request
-    // to your WordPress API endpoint ('/product/create')
-    // sending the 'productData' object.
-    alert('Check the console (F12) to see the gathered form data!');
-  };
-
-  /**
-   * Adds a new, empty variation group
-   * (Triggered by "+ Add Variation 2")
-   */
   const addVariationGroup = () => {
-    // We only allow a max of 2 variation groups as per Shopee structure
     if (variations.length < 2) {
       setVariations(prevVariations => [
         ...prevVariations,
@@ -370,450 +207,295 @@ function App() {
           options: [],
           showCustom: false,
           currentOptionInput: '',
-          sizeFormat: '' // <-- ADD THIS LINE
+          sizeFormat: ''
         }
       ]);
     }
   };
 
-  // Render the main "Add Product" form
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    const productData = {
+      productName: productName,
+      selectedCategory: selectedCategory,
+      productDescription: productDescription,
+      brand: brand,
+      price: price,
+      sku: sku,
+      stock: stock,
+      hasVariations: hasVariations,
+      variationConfig: hasVariations ? variations : null,
+      variationDetails: hasVariations ? variationTableData : null,
+      weight: weight,
+      packageDimensions: {
+        length: pkgLength,
+        width: pkgWidth,
+        height: pkgHeight,
+      },
+    };
+    console.log("Form Data Submitted (Client-Side):");
+    console.log(JSON.stringify(productData, null, 2));
+    alert('Check the console (F12) to see the gathered form data!');
+  };
+
+
+  // --- NEW: FormNavTabs Component Definition ---
+  const FormNavTabs = () => {
+    const tabs = [
+      { id: 'basic-info-section', label: '1. Basic Information' },
+      { id: 'sales-info-section', label: '2. Sales Information' },
+      { id: 'variations-section', label: '3. Product Variations' },
+      { id: 'shipping-section', label: '4. Shipping' },
+    ];
+
     return (
-      <div className="App">
-        <header className="App-header">
-          <h1>Add New Product</h1>
-          
-          <form className="add-product-form">
-            
-            {/* --- Basic Information Section --- */}
-            <div className="form-section">
-              <h2>1. Basic Information</h2>
-              
-              <div className="form-group">
-                <label>Product Images *</label>
-                <div className="placeholder-uploader">
-                  This is the placeholder for the Image Uploader.
-                </div>
-              </div>
-
-              <div className="form-group">
-                <label>Product Video</label>
-                <div className="placeholder-uploader">
-                  This is the placeholder for the Video Uploader.
-                </div>
-              </div>
-
-              <div className="form-group">
-                <label htmlFor="productName">Product Name *</label>
-                <input
-                  type="text"
-                  id="productName"
-                  value={productName}
-                  onChange={(e) => setProductName(e.target.value)}
-                  required
-                />
-              </div>
-
-              <div className="form-group">
-                <label htmlFor="productCategory">Product Category *</label>
-                <select
-                  id="productCategory"
-                  value={selectedCategory}
-                  onChange={(e) => setSelectedCategory(e.target.value)}
-                  required
-                >
-                  <option value="" disabled>Select a category</option>
-                  {categories.map(category => (
-                    <option key={category.term_id} value={category.term_id}>
-                      {category.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div className="form-group">
-                <label htmlFor="productDescription">Product Description *</label>
-                <textarea
-                  id="productDescription"
-                  value={productDescription}
-                  onChange={(e) => setProductDescription(e.target.value)}
-                  rows="8"
-                  required
-                ></textarea>
-              </div>
-
-              <div className="form-group">
-                <label htmlFor="brand">Brand</label>
-                <input
-                  type="text"
-                  id="brand"
-                  value={brand}
-                  onChange={(e) => setBrand(e.target.value)}
-                  placeholder="e.g., Nike, Adidas (Leave blank for 'No Brand')"
-                />
-              </div>
-            </div>
-
-            {/* --- Sales Information Section --- */}
-            <div className="form-section">
-              <h2>2. Sales Information</h2>
-
-              <div className="form-group">
-                <label htmlFor="productPrice">Your Price (RM) *</label>
-                <input
-                  type="number"
-                  id="productPrice"
-                  value={price}
-                  onChange={(e) => setPrice(e.target.value)}
-                  step="0.01"
-                  min="0"
-                  required
-                  placeholder="e.g., 25.50"
-                />
-              </div>
-
-              <div className="form-group">
-                <label htmlFor="productSku">SKU (Stock Keeping Unit) *</label>
-                <input
-                  type="text"
-                  id="productSku"
-                  value={sku}
-                  onChange={(e) => setSku(e.target.value)}
-                  required
-                  placeholder="e.g., TSHIRT-BLK-M"
-                />
-              </div>
-
-              <div className="form-group">
-                <label htmlFor="productStock">Stock Quantity *</label>
-                <input
-                  type="number"
-                  id="productStock"
-                  value={stock}
-                  onChange={(e) => setStock(e.target.value)}
-                  step="1"
-                  min="0"
-                  required
-                  placeholder="e.g., 100"
-                />
-              </div>
-            </div>
-
-            {/* --- Product Variations Section --- */}
-            <div className="form-section">
-              <h2>3. Product Variations</h2>
-
-              <div className="form-group">
-                <button
-                  type="button"
-                  onClick={toggleVariations}
-                  className={`button ${hasVariations ? 'button-secondary' : 'button-primary'}`}
-                >
-                  {hasVariations ? 'Disable Variations' : 'Enable Variations'}
-                </button>
-                <p className="form-hint">
-                  Enable this if your product comes in different options like size or color.
-                </p>
-              </div>
-
-              {/* --- Variation Details UI will go here --- */}
-              {hasVariations && (
-                <div id="variations-details">
-
-                  {/* === Map over the variations state array === */}
-                  {variations.map((group, index) => (
-                    <div key={group.id} className="variation-group">
-                      
-                      {/* --- Variation Name Group (Dynamic) --- */}
-                      <div className="form-group variation-name-group">
-                        <label htmlFor={`variation-name-${index}`}>Variation {index + 1} Name *</label>
-                        
-                        <select
-                          id={`variation-name-${index}`}
-                          value={group.showCustom ? 'custom' : (group.name || '')}
-                          onChange={(e) => handleGroupNameChange(e, index)}
-                        >
-                          <option value="" disabled>Select or Type</option>
-                          <option value="Color">Color</option>
-                          <option value="Size">Size</option>
-                          <option value="custom">Custom...</option>
-                        </select>
-
-                        {/* Conditional input for custom name */}
-                        {group.showCustom && (
-                          <input
-                            type="text"
-                            id={`variation-custom-name-${index}`}
-                            placeholder="Enter Custom Variation Name"
-                            value={group.name}
-                            onChange={(e) => handleCustomGroupNameChange(e, index)}
-                            style={{ marginTop: '10px' }}
-                          />
-                        )}
-                        
-                        {/* --- THIS IS THE LINE TO UPDATE --- */}
-                        <button 
-                          type="button" 
-                          className="button-icon remove-variation-group" 
-                          title="Remove Variation Group"
-                          onClick={() => handleRemoveGroup(index)}
-                        >
-                          &times;
-                        </button>
-
-                      </div>
-
-                      {/* === Conditional Size Format Group === */}
-                      {group.name === 'Size' && (
-                        <div className="form-group variation-size-format">
-                          <label>Size Format</label>
-                          <div className="radio-group">
-                            <label>
-                              <input 
-                                type="radio" 
-                                name={`size-format-${index}`} 
-                                value="International" 
-                                checked={group.sizeFormat === 'International'}
-                                onChange={(e) => handleSizeFormatChange(e, index)}
-                              />
-                              International (S, M, L)
-                            </label>
-                            <label>
-                              <input 
-                                type="radio" 
-                                name={`size-format-${index}`} 
-                                value="EU" 
-                                checked={group.sizeFormat === 'EU'}
-                                onChange={(e) => handleSizeFormatChange(e, index)}
-                              />
-                              EU (38, 39, 40)
-                            </label>
-                            <label>
-                              <input 
-                                type="radio" 
-                                name={`size-format-${index}`} 
-                                value="Custom" 
-                                checked={group.sizeFormat === 'Custom'}
-                                onChange={(e) => handleSizeFormatChange(e, index)}
-                              />
-                              Custom
-                            </label>
-                          </div>
-
-                          {/* Placeholder for custom size format input */}
-                          {group.sizeFormat === 'Custom' && (
-                            <input
-                              type="text"
-                              placeholder="Enter custom size format (e.g., US, UK)"
-                              style={{ marginTop: '10px' }}
-                              // We'll add state for this later if needed
-                            />
-                          )}
-                        </div>
-                      )}
-                      {/* === END Size Format Group === */}
-
-
-                      {/* === Conditional Variation Options Group === */}
-                      {(group.name !== 'Size' || (group.name === 'Size' && group.sizeFormat)) && (
-                        <div className="form-group variation-options-group">
-                          <label htmlFor={`variation-options-${index}`}>Options *</label>
-
-                          <div className="variation-options-display">
-                            {group.options.map((option, optionIndex) => (
-                              <div key={optionIndex} className="variation-option-item">
-                                <span>{option}</span>
-                                 <button type="button" onClick={() => handleRemoveOption(index, optionIndex)}>&times;</button>
-                              </div>
-                            ))}
-                          </div>
-
-                          <input
-                            type="text"
-                            id={`variation-options-${index}`}
-                            placeholder={
-                              group.name === 'Size' 
-                              ? `e.g., S (Type and press Enter)` 
-                              : `e.g., Red (Type and press Enter)`
-                            }
-                            value={group.currentOptionInput}
-                            onChange={(e) => handleCurrentOptionChange(e, index)}
-                            onKeyDown={(e) => handleAddOption(e, index)}
-                          />
-                          <p className="form-hint">Press Enter after typing each option.</p>
-                        </div>
-                      )}
-                      {/* === END Conditional Options Group === */}
-
-                    </div>
-                  ))}
-                  {/* === End of .map() loop === */}
-
-                  {/* === NEW: Variation List Table === */}
-                  {variationTableData.length > 0 && variations.length === 1 && (
-                    <div className="variation-table-container">
-                      <table className="variation-table">
-                        <thead>
-                          <tr>
-                            {/* Dynamic header from the variation group name */}
-                            <th>{variations[0].name || 'Variation'}</th>
-                            <th>Price (RM) *</th>
-                            <th>Stock Quantity *</th>
-                            <th>SKU *</th>
-                            <th>Image</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {variationTableData.map((row, rowIndex) => (
-                            <tr key={row.id}>
-                              {/* Option Name */}
-                              <td>{row.optionName}</td>
-                              
-                              {/* Price Input */}
-                              <td>
-                                <input 
-                                  type="number"
-                                  value={row.price}
-                                  onChange={(e) => handleTableInputChange(e, rowIndex, 'price')}
-                                  placeholder="e.g., 25.50"
-                                  step="0.01"
-                                  min="0"
-                                />
-                              </td>
-                              
-                              {/* Stock Input */}
-                              <td>
-                                <input 
-                                  type="number"
-                                  value={row.stock}
-                                  onChange={(e) => handleTableInputChange(e, rowIndex, 'stock')}
-                                  placeholder="e.g., 100"
-                                  step="1"
-                                  min="0"
-                                />
-                              </td>
-
-                              {/* SKU Input */}
-                              <td>
-                                <input 
-                                  type="text"
-                                  value={row.sku}
-                                  onChange={(e) => handleTableInputChange(e, rowIndex, 'sku')}
-                                  placeholder="e.g., TSHIRT-RED"
-                                />
-                              </td>
-
-                              {/* Image Placeholder */}
-                              <td>
-                                <div className="placeholder-image-uploader" title="Add variation image">
-                                  +
-                                </div>
-                              </td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-                  )}
-                  {/* === END: Variation List Table === */}
-                  
-
-                  {/* --- Button to add more groups --- */}
-                  {variations.length < 2 && (
-                    <div className="form-group">
-                        <button 
-                          type="button" 
-                          className="button button-secondary add-variation-group"
-                          onClick={addVariationGroup} // Corrected function name
-                        >
-                            + Add Variation {variations.length + 1}
-                        </button>
-                    </div>
-                  )}
-
-                </div>
-              )}
-            </div>
-            {/* --- End Product Variations Section --- */}
-
-            {/* --- Shipping Section --- */}
-            <div className="form-section">
-              <h2>4. Shipping</h2>
-
-              <div className="form-group">
-                <label htmlFor="productWeight">Weight (kg) *</label>
-                <input
-                  type="number"
-                  id="productWeight"
-                  name="product_weight"
-                  value={weight}
-                  onChange={(e) => setWeight(e.target.value)}
-                  step="0.01"
-                  min="0"
-                  required
-                  placeholder="e.g., 0.5"
-                />
-                <p className="form-hint">Enter the weight of the product after packaging.</p>
-              </div>
-
-              <div className="form-group">
-                <label>Package Dimensions (cm)</label>
-                <div className="form-grid-3">
-                  {/* Length */}
-                  <input
-                    type="number"
-                    name="product_length"
-                    value={pkgLength}
-                    onChange={(e) => setPkgLength(e.target.value)}
-                    step="0.1"
-                    min="0"
-                    placeholder="Length"
-                    aria-label="Package Length in cm"
-                  />
-                  {/* Width */}
-                  <input
-                    type="number"
-                    name="product_width"
-                    value={pkgWidth}
-                    onChange={(e) => setPkgWidth(e.target.value)}
-                    step="0.1"
-                    min="0"
-                    placeholder="Width"
-                    aria-label="Package Width in cm"
-                  />
-                  {/* Height */}
-                  <input
-                    type="number"
-                    name="product_height"
-                    value={pkgHeight}
-                    onChange={(e) => setPkgHeight(e.target.value)}
-                    step="0.1"
-                    min="0"
-                    placeholder="Height"
-                    aria-label="Package Height in cm"
-                  />
-                </div>
-                <p className="form-hint">Enter the Length x Width x Height of the package after packing.</p>
-              </div>
-            </div>
-            {/* --- End Shipping Section --- */}
-
-            {/* --- Form Submission Button --- */}
-            <div className="form-section form-actions" style={{ textAlign: 'right', borderBottom: 'none', paddingBottom: 0 }}>
-              {/* Add other buttons like "Save as Draft" here later if needed */}
-              <button
-                type="button" // Use type="button" initially to prevent accidental default submission
-                onClick={handleSubmit} // Attach the handler here
-                className="button button-primary"
-              >
-                Save and Publish (Log Data)
-              </button>
-            </div>
-            {/* ---End Form Submission Button --- */}
-
-          </form>
-        </header> {/* <-- Note: The closing </header> tag is here */}
-      </div>
+      <nav className="form-nav-tabs">
+        {tabs.map(tab => (
+          <button
+            key={tab.id}
+            type="button" 
+            className={`nav-tab ${activeSection === tab.id ? 'active' : ''}`}
+            onClick={() => handleTabClick(tab.id)}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </nav>
     );
-  }
+  };
+  // --- END: FormNavTabs Component Definition ---
 
-export default App;
+
+  // --- JSX Structure ---
+  // No more isLoading or error checks here
+  return (
+    <form className="add-product-form">
+      <h1>Add New Product</h1>
+
+      {/* --- Render the Nav Tabs Here --- */}
+      <FormNavTabs />
+
+      {/* --- Basic Information Section --- */}
+      <div id="basic-info-section" className="form-section">
+        <h2>1. Basic Information</h2>
+        
+        <div className="form-group">
+          <label>Product Images *</label>
+          <div className="placeholder-uploader">Image Uploader Placeholder</div>
+        </div>
+        
+        <div className="form-group">
+          <label>Product Video</label>
+          <div className="placeholder-uploader">Video Uploader Placeholder</div>
+        </div>
+
+        <div className="form-group">
+          <label htmlFor="productName">Product Name *</label>
+          <input type="text" id="productName" value={productName} onChange={(e) => setProductName(e.target.value)} required />
+        </div>
+
+        <div className="form-group">
+          <label htmlFor="productCategory">Product Category *</label>
+          <select id="productCategory" value={selectedCategory} onChange={(e) => setSelectedCategory(e.target.value)} required>
+            <option value="" disabled>Select a category</option>
+            {/* Use the 'categories' prop passed from App.js */}
+            {categories.map(category => ( 
+              <option key={category.id} value={category.id}>
+                {category.name}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div className="form-group">
+          <label htmlFor="productDescription">Product Description *</label>
+          <textarea id="productDescription" value={productDescription} onChange={(e) => setProductDescription(e.target.value)} rows="8" required></textarea>
+        </div>
+
+        <div className="form-group">
+          <label htmlFor="brand">Brand</label>
+          <input type="text" id="brand" value={brand} onChange={(e) => setBrand(e.target.value)} placeholder="e.g., Nike, Adidas (Leave blank for 'No Brand')" />
+        </div>
+      </div>
+
+      {/* --- Sales Information Section --- */}
+      <div id="sales-info-section" className="form-section">
+        <h2>2. Sales Information</h2>
+        <div className="form-group">
+          <label htmlFor="productPrice">Your Price (RM) *</label>
+          <input type="number" id="productPrice" value={price} onChange={(e) => setPrice(e.target.value)} step="0.01" min="0" required={!hasVariations} disabled={hasVariations} placeholder="e.g., 25.50" />
+        </div>
+        <div className="form-group">
+          <label htmlFor="productSku">SKU *</label>
+          <input type="text" id="productSku" value={sku} onChange={(e) => setSku(e.target.value)} required={!hasVariations} disabled={hasVariations} placeholder="e.g., TSHIRT-BLK-M" />
+        </div>
+        <div className="form-group">
+          <label htmlFor="productStock">Stock Quantity *</label>
+          <input type="number" id="productStock" value={stock} onChange={(e) => setStock(e.target.value)} step="1" min="0" required={!hasVariations} disabled={hasVariations} placeholder="e.g., 100" />
+        </div>
+      </div>
+
+      {/* --- Product Variations Section --- */}
+      <div id="variations-section" className="form-section">
+        <h2>3. Product Variations</h2>
+        <div className="form-group">
+          <button type="button" onClick={toggleVariations} className={`button ${hasVariations ? 'button-secondary' : 'button-primary'}`}>
+            {hasVariations ? 'Disable Variations' : 'Enable Variations'}
+          </button>
+          <p className="form-hint">Enable this if your product comes in different options.</p>
+        </div>
+
+        {hasVariations && (
+          <div id="variations-details">
+            {variations.map((group, index) => (
+              <div key={group.id} className="variation-group">
+                
+                <div className="form-group variation-name-group">
+                  <label htmlFor={`variation-name-${index}`}>Variation {index + 1} Name *</label>
+                  <select id={`variation-name-${index}`} value={group.showCustom ? 'custom' : (group.name || '')} onChange={(e) => handleGroupNameChange(e, index)}>
+                    <option value="" disabled>Select or Type</option>
+                    <option value="Color">Color</option>
+                    <option value="Size">Size</option>
+                    <option value="custom">Custom...</option>
+                  </select>
+                  {group.showCustom && (
+                    <input
+                      type="text"
+                      id={`variation-custom-name-${index}`}
+                      placeholder="Enter Custom Variation Name"
+                      value={group.name}
+                      onChange={(e) => handleCustomGroupNameChange(e, index)}
+                      style={{ marginTop: '10px' }}
+                    />
+                  )}
+                  <button type="button" className="button-icon remove-variation-group" title="Remove Variation Group" onClick={() => handleRemoveGroup(index)}>
+                    &times;
+                  </button>
+                </div>
+
+                {group.name === 'Size' && (
+                  <div className="form-group variation-size-format">
+                    <label>Size Format</label>
+                    <div className="radio-group">
+                      <label>
+                        <input type="radio" name={`size-format-${index}`} value="International" checked={group.sizeFormat === 'International'} onChange={(e) => handleSizeFormatChange(e, index)} />
+                        International (S, M, L)
+                      </label>
+                      <label>
+                        <input type="radio" name={`size-format-${index}`} value="EU" checked={group.sizeFormat === 'EU'} onChange={(e) => handleSizeFormatChange(e, index)} />
+                        EU (38, 39, 40)
+                      </label>
+                      <label>
+                        <input type="radio" name={`size-format-${index}`} value="Custom" checked={group.sizeFormat === 'Custom'} onChange={(e) => handleSizeFormatChange(e, index)} />
+                        Custom
+                      </label>
+                    </div>
+                    {group.sizeFormat === 'Custom' && (
+                      <input type="text" placeholder="Enter custom size format (e.g., US, UK)" style={{ marginTop: '10px' }} />
+                    )}
+                  </div>
+                )}
+
+                {(group.name !== 'Size' || (group.name === 'Size' && group.sizeFormat)) && (
+                  <div className="form-group variation-options-group">
+                    <label htmlFor={`variation-options-${index}`}>Options *</label>
+                    <div className="variation-options-display">
+                      {group.options.map((option, optionIndex) => (
+                        <div key={optionIndex} className="variation-option-item">
+                          <span>{option}</span>
+                          <button type="button" onClick={() => handleRemoveOption(index, optionIndex)}>&times;</button>
+                        </div>
+                      ))}
+                    </div>
+                    <input
+                      type="text"
+                      id={`variation-options-${index}`}
+                      placeholder={group.name === 'Size' ? `e.g., S (Type and press Enter)` : `e.g., Red (Type and press Enter)`}
+                      value={group.currentOptionInput}
+                      onChange={(e) => handleCurrentOptionChange(e, index)}
+                      onKeyDown={(e) => handleAddOption(e, index)}
+                    />
+                    <p className="form-hint">Press Enter after typing each option.</p>
+                  </div>
+                )}
+              </div>
+            ))}
+
+            {variationTableData.length > 0 && variations.length === 1 && (
+              <div className="variation-table-container">
+                <table className="variation-table">
+                  <thead>
+                    <tr>
+                      <th>{variations[0].name || 'Variation'}</th>
+                      <th>Price (RM) *</th>
+                      <th>Stock Quantity *</th>
+                      <th>SKU *</th>
+                      <th>Image</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {variationTableData.map((row, rowIndex) => (
+                      <tr key={row.id}>
+                        <td>{row.optionName}</td>
+                        <td>
+                          <input type="number" value={row.price} onChange={(e) => handleTableInputChange(e, rowIndex, 'price')} placeholder="e.g., 25.50" step="0.01" min="0" />
+                        </td>
+                        <td>
+                          <input type="number" value={row.stock} onChange={(e) => handleTableInputChange(e, rowIndex, 'stock')} placeholder="e.g., 100" step="1" min="0" />
+                        </td>
+                        <td>
+                          <input type="text" value={row.sku} onChange={(e) => handleTableInputChange(e, rowIndex, 'sku')} placeholder="e.g., TSHIRT-RED" />
+                        </td>
+                        <td>
+                          <div className="placeholder-image-uploader" title="Add variation image">+</div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+            
+            {variations.length < 2 && (
+              <div className="form-group">
+                <button type="button" className="button button-secondary add-variation-group" onClick={addVariationGroup}>
+                  + Add Variation {variations.length + 1}
+                </button>
+              </div>
+            )}
+
+          </div>
+        )}
+      </div>
+
+      {/* --- Shipping Section --- */}
+      <div id="shipping-section" className="form-section">
+        <h2>4. Shipping</h2>
+        <div className="form-group">
+          <label htmlFor="productWeight">Weight (kg) *</label>
+          <input type="number" id="productWeight" name="product_weight" value={weight} onChange={(e) => setWeight(e.target.value)} step="0.01" min="0" required placeholder="e.g., 0.5" />
+          <p className="form-hint">Enter the weight of the product after packaging.</p>
+        </div>
+        <div className="form-group">
+          <label>Package Dimensions (cm)</label>
+          <div className="form-grid-3">
+            <input type="number" name="product_length" value={pkgLength} onChange={(e) => setPkgLength(e.target.value)} step="0.1" min="0" placeholder="Length" aria-label="Package Length in cm" />
+            <input type="number" name="product_width" value={pkgWidth} onChange={(e) => setPkgWidth(e.target.value)} step="0.1" min="0" placeholder="Width" aria-label="Package Width in cm" />
+            <input type="number" name="product_height" value={pkgHeight} onChange={(e) => setPkgHeight(e.target.value)} step="0.1" min="0" placeholder="Height" aria-label="Package Height in cm" />
+          </div>
+          <p className="form-hint">Enter the Length x Width x Height of the package after packing.</p>
+        </div>
+      </div>
+
+      {/* --- Form Submission Button --- */}
+      <div className="form-section form-actions" style={{ textAlign: 'right', borderBottom: 'none', paddingBottom: 0 }}>
+        <button type="button" onClick={handleSubmit} className="button button-primary">
+          Save and Publish (Log Data)
+        </button>
+      </div>
+
+    </form>
+  );
+}
+
+export default AddProductForm;

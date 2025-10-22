@@ -3,7 +3,7 @@
  */
 
 .App {
-  /* text-align: center; <-- REMOVE this line */
+   text-align: center;
 }
 
 .App-header {
@@ -227,4 +227,59 @@
      flex-basis: auto;
      width: 100%;
    }
+}
+
+/* --- Form Navigation Tabs Styles --- */
+
+.form-nav-tabs {
+  display: flex;
+  background-color: #3a3f4a;
+  border-bottom: 1px solid #5d6472;
+  margin-bottom: 20px;
+
+  /* --- Sticky Positioning --- */
+  position: sticky;
+  top: 0;
+  z-index: 10;
+
+  /* --- NEW: Allow horizontal scrolling --- */
+  overflow-x: auto;
+  /* Optional: Add padding for scrollbar */
+  padding-bottom: 5px;
+  /* Optional: Hide scrollbar visually (still scrollable) */
+  /* -ms-overflow-style: none;  /* IE and Edge */
+  /* scrollbar-width: none;  /* Firefox */
+}
+/* Optional: Hide scrollbar for Chrome, Safari, Opera */
+/* .form-nav-tabs::-webkit-scrollbar {
+    display: none;
+} */
+
+.nav-tab {
+  flex: 1; /* Make tabs distribute space evenly */
+  padding: 12px 15px;
+  text-align: center;
+  background: none;
+  border: none;
+  border-bottom: 3px solid transparent; /* Default inactive border */
+  color: #ccc; /* Inactive text color */
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: color 0.2s ease, border-bottom-color 0.2s ease;
+  white-space: nowrap; /* Prevent text wrapping */
+}
+
+.nav-tab:hover {
+  color: #fff; /* Lighter color on hover */
+}
+
+.nav-tab.active {
+  color: #a9c1ff; /* Active text color (matches section headers) */
+  border-bottom-color: #a9c1ff; /* Active border color */
+}
+
+/* Adjust margin below H1 if needed */
+.add-product-form h1 {
+    margin-bottom: 10px; /* Add some space between H1 and sticky nav */
 }
