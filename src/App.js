@@ -23,6 +23,11 @@ function App() {
   const [variations, setVariations] = useState([]); // Start with an empty array
   // Add this line
   const [variationTableData, setVariationTableData] = useState([]);
+  // Add these lines for Shipping Information
+  const [weight, setWeight] = useState('');
+  const [pkgLength, setPkgLength] = useState('');
+  const [pkgWidth, setPkgWidth] = useState('');
+  const [pkgHeight, setPkgHeight] = useState('');
 
   // Tracks whether the categories are still being loaded
   const [isLoading, setIsLoading] = useState(true);
@@ -507,7 +512,7 @@ function App() {
                         >
                           &times;
                         </button>
-                        
+
                       </div>
 
                       {/* === Conditional Size Format Group === */}
@@ -682,6 +687,68 @@ function App() {
               )}
             </div>
             {/* --- End Product Variations Section --- */}
+
+            {/* --- Shipping Section --- */}
+            <div className="form-section">
+              <h2>4. Shipping</h2>
+
+              <div className="form-group">
+                <label htmlFor="productWeight">Weight (kg) *</label>
+                <input
+                  type="number"
+                  id="productWeight"
+                  name="product_weight"
+                  value={weight}
+                  onChange={(e) => setWeight(e.target.value)}
+                  step="0.01"
+                  min="0"
+                  required
+                  placeholder="e.g., 0.5"
+                />
+                <p className="form-hint">Enter the weight of the product after packaging.</p>
+              </div>
+
+              <div className="form-group">
+                <label>Package Dimensions (cm)</label>
+                <div className="form-grid-3">
+                  {/* Length */}
+                  <input
+                    type="number"
+                    name="product_length"
+                    value={pkgLength}
+                    onChange={(e) => setPkgLength(e.target.value)}
+                    step="0.1"
+                    min="0"
+                    placeholder="Length"
+                    aria-label="Package Length in cm"
+                  />
+                  {/* Width */}
+                  <input
+                    type="number"
+                    name="product_width"
+                    value={pkgWidth}
+                    onChange={(e) => setPkgWidth(e.target.value)}
+                    step="0.1"
+                    min="0"
+                    placeholder="Width"
+                    aria-label="Package Width in cm"
+                  />
+                  {/* Height */}
+                  <input
+                    type="number"
+                    name="product_height"
+                    value={pkgHeight}
+                    onChange={(e) => setPkgHeight(e.target.value)}
+                    step="0.1"
+                    min="0"
+                    placeholder="Height"
+                    aria-label="Package Height in cm"
+                  />
+                </div>
+                <p className="form-hint">Enter the Length x Width x Height of the package after packing.</p>
+              </div>
+            </div>
+            {/* --- End Shipping Section --- */}
 
           </form>
         </header> {/* <-- Note: The closing </header> tag is here */}
