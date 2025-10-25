@@ -115,7 +115,11 @@
 /* Specific column widths (REVISED) */
 .suggestions-column {
   flex: 0 0 250px; /* No grow, No shrink, Fixed base width */
-  /* min-width: 200px; <-- Can remove or keep this */
+  
+  /* --- Make column sticky --- */
+  position: -webkit-sticky; /* For Safari */
+  position: sticky;
+  top: 20px; /* Stick 20px from the top (matches container padding) */
 }
 
 .form-column {
@@ -126,7 +130,11 @@
 
 .preview-column {
   flex: 0 0 300px; /* No grow, No shrink, Fixed base width */
-  /* min-width: 250px; <-- Can remove or keep this */
+
+  /* --- Make column sticky --- */
+  position: -webkit-sticky; /* For Safari */
+  position: sticky;
+  top: 20px; /* Stick 20px from the top (matches container padding) */
 }
 
 /* Adjustments for the form now inside a column */
