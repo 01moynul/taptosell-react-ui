@@ -5,6 +5,7 @@ import React, { useState, useEffect } from 'react';
 import './App.css';
 import AddProductForm from './AddProductForm';
 import ProductPreview from './ProductPreview'; 
+import FilingSuggestions from './FilingSuggestions';
 
 function App() {
   // --- State for API data and loading status ---
@@ -97,17 +98,26 @@ function App() {
       {/* Container for the 3-column Add Product layout */}
       <div className="add-product-layout-container">
 
-        {/* --- Column 1: Filing Suggestions (Placeholder) --- */}
+        {/* --- Column 1: Dynamic Filing Suggestions --- */}
         <div className="layout-column suggestions-column">
-          <h2>Filing Suggestions</h2>
-          <ul>
-            <li>✅ Add at least 3 images</li>
-            <li>⬜️ Add video</li>
-            <li>✅ Add characters for name to 25~100</li>
-            <li>⬜️ Add at least 100 characters or 1 image for description</li>
-          </ul>
-           <h2>Tips</h2>
-           <p>Variation: Add up to 2 tiers...</p>
+          {/* Render the FilingSuggestions component, passing down relevant state */}
+          <FilingSuggestions
+            productName={productName}
+            selectedCategory={selectedCategory}
+            productDescription={productDescription}
+            price={price}
+            hasVariations={hasVariations}
+            variationTableData={variationTableData}
+            
+            // --- ADD THESE NEW PROPS ---
+            sku={sku}
+            stock={stock}
+            weight={weight}
+            pkgLength={pkgLength}
+            pkgWidth={pkgWidth}
+            pkgHeight={pkgHeight}
+            // --- END ADD ---
+          />
         </div>
 
         {/* --- Column 2: Add Product Form --- */}

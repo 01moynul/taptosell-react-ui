@@ -135,6 +135,13 @@
   position: -webkit-sticky; /* For Safari */
   position: sticky;
   top: 20px; /* Stick 20px from the top (matches container padding) */
+
+  /* --- Force content wrapping within the column --- */
+  word-wrap: break-word;     /* Older browsers */
+  overflow-wrap: break-word; /* Modern browsers */
+
+  /* --- ADD THIS: Allow column to shrink below content size if needed --- */
+  min-width: 0;
 }
 
 /* Adjustments for the form now inside a column */
@@ -158,23 +165,88 @@
     color: #a9c1ff; /* Keep specific heading color */
 }
 
-/* Placeholder styling */
-.suggestions-column ul {
-  list-style: none;
-  padding: 0;
-}
-.suggestions-column li {
-  margin-bottom: 8px;
-  color: #ccc;
-}
-.suggestions-column li::before {
-  margin-right: 8px;
-}
-.suggestions-column li:first-child::before { content: '✅'; } /* Example */
-.suggestions-column li:nth-child(2)::before { content: '⬜️'; } /* Example */
-.suggestions-column h2 {
+/* --- Filing Suggestions Component Styles --- */
+
+.filing-suggestions-component h2 {
   font-size: 1.1rem;
   margin-top: 0;
+  text-align: left;
+  border-bottom: 1px solid #5d6472;
+  padding-bottom: 10px;
+  margin-bottom: 15px;
+}
+
+/* --- Score Bar --- */
+.suggestion-score {
+  margin-bottom: 20px;
+}
+.suggestion-score p {
+  font-size: 0.9rem;
+  margin: 0 0 8px 0;
+}
+.score-bar-container {
+  width: 100%;
+  height: 8px;
+  background-color: #555;
+  border-radius: 4px;
+  overflow: hidden;
+}
+.score-bar-fill {
+  height: 100%;
+  background-color: #4caf50; /* Green */
+  border-radius: 4px;
+  transition: width 0.3s ease-in-out;
+}
+
+/* --- Suggestion List --- */
+.filing-suggestions-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 20px 0;
+}
+
+.suggestion-item {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 12px;
+  font-size: 0.9rem;
+}
+
+.suggestion-icon {
+  margin-right: 8px;
+  /* Prevent icon from shrinking */
+  flex-shrink: 0;
+}
+
+.suggestion-text {
+  line-height: 1.4;
+}
+
+/* Style for completed items */
+.suggestion-item.complete .suggestion-text {
+  color: #90ee90; /* Light green */
+  text-decoration: line-through;
+}
+
+/* Style for incomplete items */
+.suggestion-item.incomplete .suggestion-text {
+  color: #ccc;
+}
+
+/* --- Static Tips Section --- */
+.static-tips {
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid #5d6472;
+}
+.static-tips h2 {
+  margin-bottom: 15px;
+}
+.static-tips p {
+  font-size: 0.85rem;
+  color: #ccc;
+  line-height: 1.5;
+  margin-bottom: 15px;
 }
 
 .preview-column h2 {
@@ -380,6 +452,11 @@
 .preview-meta p,
 .preview-description p {
     margin-bottom: 5px;
+    
+    /* --- NEW: Ensure text wraps within the container --- */
+    word-wrap: break-word; /* Older browsers */
+    overflow-wrap: break-word; /* Modern browsers */
+    white-space: normal; /* Ensure text wraps normally */
 }
 .preview-description h4 {
     margin-top: 0;
