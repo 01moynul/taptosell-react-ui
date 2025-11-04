@@ -69,13 +69,12 @@
 
 .form-group select,
 .form-group input[type="text"],
-.form-group input[type="number"],
 .form-group textarea {
   padding: 10px;
   border-radius: 4px;
-  border: 1px solid #ccc; /* Lighter border */
-  background-color: #ffffff; /* White background */
-  color: #222831; /* Dark text */
+  border: 1px solid #7a8290;
+  background-color: #282c34;
+  color: white;
   font-size: 1rem;
 }
 
@@ -83,16 +82,9 @@
   cursor: pointer;
 }
 
-/* Options should have a standard light theme */
 .form-group option {
-  background-color: #ffffff;
-  color: #222831;
-}
-
-/* Style placeholders to be light grey */
-.form-group input::placeholder,
-.form-group textarea::placeholder {
-  color: #999;
+  background-color: #3a3f4a;
+  color: white;
 }
 
 /* --- 3-Column Layout Styles --- */
@@ -110,11 +102,10 @@
 }
 
 .layout-column {
-  background-color: #ffffff; /* New white column background */
-  border-radius: 5px; /* Slightly smaller radius */
+  background-color: #3a3f4a; /* Slightly lighter background for columns */
+  border-radius: 8px;
   padding: 20px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.05); /* Lighter shadow */
-  border: 1px solid #e0e0e0; /* Light border */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
 /* Specific column widths (REVISED) */
@@ -151,24 +142,23 @@
 
 /* Adjustments for the form now inside a column */
 .form-column .add-product-form {
-  max-width: none;
+  max-width: none; /* Allow form to fill the column */
   width: 100%;
-  padding: 0;
-  box-shadow: none;
-  background-color: transparent;
-  border-radius: 0;
-  color: #222831; /* New dark text color */
+  padding: 0; /* Remove padding, column has padding */
+  box-shadow: none; /* Remove shadow, column has shadow */
+  background-color: transparent; /* Make form background transparent */
+  border-radius: 0; /* Remove form radius */
+  color: white; /* Ensure form text is white */
 }
 
 /* Ensure form elements inherit color */
 .form-column .add-product-form label,
 .form-column .add-product-form h1,
 .form-column .add-product-form h2 {
-  color: #222831; /* New dark text color */
+  color: white; /* Or a lighter color like #e0e0e0 */
 }
 .form-column .add-product-form h2 {
-    color: #222831; /* New dark text color */
-    border-bottom: 1px solid #e0e0e0; /* Lighter border */
+    color: #a9c1ff; /* Keep specific heading color */
 }
 
 /* --- Filing Suggestions Component Styles --- */
@@ -177,10 +167,9 @@
   font-size: 1.1rem;
   margin-top: 0;
   text-align: left;
-  border-bottom: 1px solid #e0e0e0; /* Lighter border */
+  border-bottom: 1px solid #5d6472;
   padding-bottom: 10px;
   margin-bottom: 15px;
-  color: #222831; /* Dark text */
 }
 
 /* --- Score Bar --- */
@@ -237,21 +226,21 @@
 
 /* Style for incomplete items */
 .suggestion-item.incomplete .suggestion-text {
-  color: #555; /* Darker incomplete text */
+  color: #ccc;
 }
 
 /* --- Static Tips Section --- */
 .static-tips {
   margin-top: 20px;
   padding-top: 20px;
-  border-top: 1px solid #e0e0e0; /* Lighter border */
+  border-top: 1px solid #5d6472;
 }
 .static-tips h2 {
   margin-bottom: 15px;
 }
 .static-tips p {
   font-size: 0.85rem;
-  color: #555; /* Darker tips text */
+  color: #ccc;
   line-height: 1.5;
   margin-bottom: 15px;
 }
@@ -320,8 +309,8 @@
 
 .form-nav-tabs {
   display: flex;
-  background-color: #ffffff; /* White background */
-  border-bottom: 1px solid #e0e0e0; /* Lighter border */
+  background-color: #3a3f4a;
+  border-bottom: 1px solid #5d6472;
   margin-bottom: 20px;
 
   /* --- Sticky Positioning --- */
@@ -329,32 +318,41 @@
   top: 0;
   z-index: 10;
 
-  /* --- Allow horizontal scrolling --- */
+  /* --- NEW: Allow horizontal scrolling --- */
   overflow-x: auto;
+  /* Optional: Add padding for scrollbar */
   padding-bottom: 5px;
+  /* Optional: Hide scrollbar visually (still scrollable) */
+  /* -ms-overflow-style: none;  /* IE and Edge */
+  /* scrollbar-width: none;  /* Firefox */
 }
+/* Optional: Hide scrollbar for Chrome, Safari, Opera */
+/* .form-nav-tabs::-webkit-scrollbar {
+    display: none;
+} */
+
 .nav-tab {
-  flex: 1;
+  flex: 1; /* Make tabs distribute space evenly */
   padding: 12px 15px;
   text-align: center;
   background: none;
   border: none;
-  border-bottom: 3px solid transparent;
-  color: #555; /* Darker inactive text */
+  border-bottom: 3px solid transparent; /* Default inactive border */
+  color: #ccc; /* Inactive text color */
   font-size: 0.9rem;
   font-weight: 600;
   cursor: pointer;
   transition: color 0.2s ease, border-bottom-color 0.2s ease;
-  white-space: nowrap;
+  white-space: nowrap; /* Prevent text wrapping */
 }
 
 .nav-tab:hover {
-  color: #000; /* Black text on hover */
+  color: #fff; /* Lighter color on hover */
 }
 
 .nav-tab.active {
-  color: #23B574; /* Primary Green */
-  border-bottom-color: #23B574; /* Primary Green */
+  color: #a9c1ff; /* Active text color (matches section headers) */
+  border-bottom-color: #a9c1ff; /* Active border color */
 }
 
 /* Adjust margin below H1 if needed */
@@ -368,10 +366,9 @@
   font-size: 1.1rem;
   margin-top: 0;
   text-align: center;
-  border-bottom: 1px solid #e0e0e0; /* Lighter border */
+  border-bottom: 1px solid #5d6472;
   padding-bottom: 10px;
   margin-bottom: 20px;
-  color: #222831; /* Dark text */
 }
 
 .preview-content {
@@ -379,28 +376,29 @@
 }
 
 .preview-image-placeholder {
-  background-color: #f0f0f0; /* Lighter placeholder */
-  color: #ccc; /* Lighter text */
-  height: 250px;
+  background-color: #555;
+  height: 250px; /* Make image placeholder larger */
   display: flex;
   align-items: center;
   justify-content: center;
   margin-bottom: 15px;
   border-radius: 4px;
+  color: #aaa;
 }
 
 .preview-title {
   font-size: 1.2rem;
   font-weight: bold;
   margin-bottom: 10px;
-  min-height: 1.2em;
-  word-wrap: break-word;
-  color: #222831; /* Dark text */
+  min-height: 1.2em; /* Prevent layout shift when empty */
+  word-wrap: break-word; /* Wrap long titles */
 }
-.preview-price small {
-    font-size: 0.7em;
-    color: #777; /* Darker grey text */
-    font-weight: normal;
+
+.preview-price {
+  font-size: 1.4rem;
+  color: #ff6b6b; /* A highlight color for price */
+  font-weight: bold;
+  margin-bottom: 10px;
 }
 .preview-price small {
     font-size: 0.7em;
@@ -411,7 +409,7 @@
 
 .preview-stock {
   font-size: 0.9rem;
-  color: #555; /* Darker text */
+  color: #ccc;
   margin-bottom: 20px;
 }
 
@@ -425,79 +423,40 @@
 .preview-actions button {
   flex: 1;
   padding: 10px;
-  border: 1px solid #ccc; /* Lighter border */
-  background-color: #f9f9f9; /* Light bg */
-  color: #555; /* Dark text */
+  border: 1px solid #777;
+  background-color: transparent;
+  color: #ddd;
   border-radius: 4px;
-  cursor: not-allowed;
+  cursor: not-allowed; /* Indicate they are disabled */
 }
+
 .preview-actions button.buy-now {
-  background-color: #23B574; /* Primary Green */
-  border-color: #23B574;
+  background-color: #ff6b6b;
+  border-color: #ff6b6b;
   color: white;
 }
+
 .preview-meta,
 .preview-description {
     font-size: 0.9rem;
-    color: #555; /* Darker text */
+    color: #ccc;
     text-align: left;
     margin-top: 20px;
     padding-top: 15px;
-    border-top: 1px solid #e0e0e0; /* Lighter border */
+    border-top: 1px solid #5d6472;
 }
 .preview-meta p,
 .preview-description p {
     margin-bottom: 5px;
-    word-wrap: break-word;
-    overflow-wrap: break-word;
-    white-space: normal;
+    
+    /* --- NEW: Ensure text wraps within the container --- */
+    word-wrap: break-word; /* Older browsers */
+    overflow-wrap: break-word; /* Modern browsers */
+    white-space: normal; /* Ensure text wraps normally */
 }
 .preview-description h4 {
     margin-top: 0;
     margin-bottom: 10px;
     font-size: 1rem;
-    color: #222831; /* Dark text */
-}
-
-/* --- Button Styles (New) --- */
-.button {
-  padding: 10px 20px;
-  font-size: 14px;
-  font-weight: bold;
-  text-transform: uppercase;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
-  text-decoration: none;
-  display: inline-block;
-  line-height: normal;
-  border: 1px solid transparent;
-}
-
-.button-primary {
-  background-color: #23B574; /* Primary Green */
-  border-color: #23B574;
-  color: #ffffff;
-}
-.button-primary:hover {
-  background-color: #1a8c5a; /* Darker Green */
-  border-color: #1a8c5a;
-}
-
-.button-secondary {
-  background-color: #6c757d; /* Grey */
-  border-color: #6c757d;
-  color: #ffffff;
-}
-.button-secondary:hover {
-  background-color: #5a6268; /* Darker Grey */
-  border-color: #5a6268;
-}
-
-/* Specific styling for Variation toggle buttons */
-.button.variation-toggle {
-  text-transform: none;
-  font-size: 1rem;
-  padding: 8px 16px;
-  font-weight: normal;
+    color: white;
 }
