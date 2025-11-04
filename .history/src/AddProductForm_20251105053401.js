@@ -492,94 +492,40 @@ function AddProductForm({
               </div>
             ))}
 
-                {/* === Variation List Table (UPGRADED for 1D & 2D) === */}
-                  {/* Show table if table data exists AND at least one variation group is configured */}
-                  {variationTableData.length > 0 && variations.length > 0 && (
-                    <div className="variation-table-container">
-                      <table className="variation-table">
-                        
-                        {/* --- DYNAMIC TABLE HEADER --- */}
-                        <thead>
-                          <tr>
-                            {/* Header for Group 1 (e.g., "Color") */}
-                            <th>{variations[0].name || 'Variation 1'}</th>
-                            
-                            {/* CONDITIONAL Header for Group 2 (e.g., "Size") */}
-                            {variations.length === 2 && (
-                              <th>{variations[1].name || 'Variation 2'}</th>
-                            )}
-
-                            {/* Standard Headers */}
-                            <th>Price (RM) *</th>
-                            <th>Stock Quantity *</th>
-                            <th>SKU *</th>
-                            <th>Image</th>
-                          </tr>
-                        </thead>
-
-                        {/* --- DYNAMIC TABLE BODY --- */}
-                        <tbody>
-                          {variationTableData.map((row, rowIndex) => (
-                            <tr key={row.id}> {/* Use the unique combination ID */}
-
-                              {/* Cell for Option 1 (e.g., "Black") */}
-                              <td>{row.option1Name}</td>
-
-                              {/* CONDITIONAL Cell for Option 2 (e.g., "S") */}
-                              {variations.length === 2 && (
-                                <td>{row.option2Name}</td>
-                              )}
-
-                              {/* Price Input */}
-                              <td>
-                                <input 
-                                  type="number"
-                                  value={row.price}
-                                  onChange={(e) => handleTableInputChange(e, rowIndex, 'price')}
-                                  placeholder="e.g., 25.50"
-                                  step="0.01"
-                                  min="0"
-                                  required
-                                />
-                              </td>
-                              
-                              {/* Stock Input */}
-                              <td>
-                                <input 
-                                  type="number"
-                                  value={row.stock}
-                                  onChange={(e) => handleTableInputChange(e, rowIndex, 'stock')}
-                                  placeholder="e.g., 100"
-                                  step="1"
-                                  min="0"
-                                  required
-                                />
-                              </td>
-
-                              {/* SKU Input */}
-                              <td>
-                                <input 
-                                  type="text"
-                                  value={row.sku}
-                                  onChange={(e) => handleTableInputChange(e, rowIndex, 'sku')}
-                                  placeholder="e.g., TSHIRT-BLK-S"
-                                  required
-                                />
-                              </td>
-
-                              {/* Image Placeholder */}
-                              <td>
-                                <div className="placeholder-image-uploader" title="Add variation image">
-                                  +
-                                </div>
-                              </td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-                  )}
-                {/* === END: Variation List Table === */}
+            {variationTableData.length > 0 && variations.length === 1 && (
+              <div className="variation-table-container">
+                <table className="variation-table">
+                  <thead>
+                    <tr>
+                      <th>{variations[0].name || 'Variation'}</th>
+                      <th>Price (RM) *</th>
+                      <th>Stock Quantity *</th>
+                      <th>SKU *</th>
+                      <th>Image</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {variationTableData.map((row, rowIndex) => (
+                      <tr key={row.id}>
+                        <td>{row.optionName}</td>
+                        <td>
+                          <input type="number" value={row.price} onChange={(e) => handleTableInputChange(e, rowIndex, 'price')} placeholder="e.g., 25.50" step="0.01" min="0" />
+                        </td>
+                        <td>
+                          <input type="number" value={row.stock} onChange={(e) => handleTableInputChange(e, rowIndex, 'stock')} placeholder="e.g., 100" step="1" min="0" />
+                        </td>
+                        <td>
+                          <input type="text" value={row.sku} onChange={(e) => handleTableInputChange(e, rowIndex, 'sku')} placeholder="e.g., TSHIRT-RED" />
+                        </td>
+                        <td>
+                          <div className="placeholder-image-uploader" title="Add variation image">+</div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
             
             {variations.length < 2 && (
               <div className="form-group">

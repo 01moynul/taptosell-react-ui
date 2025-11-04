@@ -51,82 +51,35 @@ function AddProductForm({
     setActiveSection
     }) {
   
-// --- Effect Hooks ---
+  // --- Effect Hooks ---
 
-  // Effect for syncing the variation table (UPGRADED for 2D combinations)
+  // Effect for syncing the variation table
   useEffect(() => {
-    // 1. Clear table if variations are off or no groups exist
     if (!hasVariations || variations.length === 0) {
-      setVariationTableData([]);
+      setVariationTableData([]); 
       return;
     }
-
-    // 2. Handle 1D Table (One variation group)
     if (variations.length === 1) {
       const group1 = variations[0];
       const options1 = group1.options;
-
       const newTableData = options1.map(optionName => {
-        // Find existing row to preserve data
-        // We also check variationTableData.find to avoid errors if it's empty
-        const existingRow = variationTableData && variationTableData.find(row => row.id === optionName);
+        const existingRow = variationTableData.find(row => row.id === optionName);
         return {
-          id: optionName, // Unique ID for this row
-          option1Name: optionName, // Name for the first column
-          option2Name: null, // No second option
+          id: optionName, 
+          optionName: optionName,
           price: existingRow?.price || '',
           stock: existingRow?.stock || '',
-          sku: existingRow?.sku || '',
+          sku: existingRow?.sku || '', 
           image: existingRow?.image || null
         };
       });
       setVariationTableData(newTableData);
-
-    // 3. Handle 2D Table (Two variation groups)
-    } else if (variations.length === 2) {
-      const group1 = variations[0];
-      const group2 = variations[1];
-
-      // Ensure both groups have options before trying to combine them
-      if (group1.options.length === 0 || group2.options.length === 0) {
-        setVariationTableData([]); // Not ready to build table yet
-        return;
-      }
-
-      const newTableData = [];
-      // Nested loop to create the Cartesian product (all combinations)
-      group1.options.forEach(option1Name => {
-        group2.options.forEach(option2Name => {
-          // Create a unique, stable ID for this combination
-          const combinationId = `${option1Name}-${option2Name}`;
-
-          // Find existing row to preserve data
-          const existingRow = variationTableData && variationTableData.find(row => row.id === combinationId);
-
-          newTableData.push({
-            id: combinationId,
-            option1Name: option1Name, // e.g., "Black"
-            option2Name: option2Name, // e.g., "S"
-            price: existingRow?.price || '',
-            stock: existingRow?.stock || '',
-            sku: existingRow?.sku || '',
-            image: existingRow?.image || null 
-          });
-        });
-      });
-      setVariationTableData(newTableData);
-    
-    // 4. Fallback (if more than 2 groups, or other weird state)
     } else {
-      setVariationTableData([]);
+      setVariationTableData([]); 
     }
-    
-  // We depend on the *source* of the change (variations) and the *functions* to update state.
-  // We do NOT depend on `variationTableData` itself, as that caused an infinite loop.
-  }, [hasVariations, JSON.stringify(variations), setVariationTableData]);
+  }, [hasVariations, JSON.stringify(variations)]); // Added variationTableData as dependency
 
-
-  // --- Effect Hook for Intersection Observer (FIXED) ---
+  // --- NEW: Effect Hook for Intersection Observer (FIXED) ---
   // This is now at the top level of this component, so it's not conditional
   useEffect(() => {
     const sections = [
@@ -147,7 +100,6 @@ function AddProductForm({
     const observer = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
         if (entry.isIntersecting) {
-          // This effect *uses* setActiveSection, so it must be in the dependency array.
           setActiveSection(entry.target.id);
         }
       });
@@ -162,8 +114,8 @@ function AddProductForm({
         observer.unobserve(section);
       });
     };
-  // FIX: Added 'setActiveSection' to the dependency array to remove the linter warning.
-  }, [setActiveSection]);
+  }, []); // Empty array, runs once on mount
+
 
   // --- Handler Functions (ALL handlers live here) ---
 
@@ -492,94 +444,40 @@ function AddProductForm({
               </div>
             ))}
 
-                {/* === Variation List Table (UPGRADED for 1D & 2D) === */}
-                  {/* Show table if table data exists AND at least one variation group is configured */}
-                  {variationTableData.length > 0 && variations.length > 0 && (
-                    <div className="variation-table-container">
-                      <table className="variation-table">
-                        
-                        {/* --- DYNAMIC TABLE HEADER --- */}
-                        <thead>
-                          <tr>
-                            {/* Header for Group 1 (e.g., "Color") */}
-                            <th>{variations[0].name || 'Variation 1'}</th>
-                            
-                            {/* CONDITIONAL Header for Group 2 (e.g., "Size") */}
-                            {variations.length === 2 && (
-                              <th>{variations[1].name || 'Variation 2'}</th>
-                            )}
-
-                            {/* Standard Headers */}
-                            <th>Price (RM) *</th>
-                            <th>Stock Quantity *</th>
-                            <th>SKU *</th>
-                            <th>Image</th>
-                          </tr>
-                        </thead>
-
-                        {/* --- DYNAMIC TABLE BODY --- */}
-                        <tbody>
-                          {variationTableData.map((row, rowIndex) => (
-                            <tr key={row.id}> {/* Use the unique combination ID */}
-
-                              {/* Cell for Option 1 (e.g., "Black") */}
-                              <td>{row.option1Name}</td>
-
-                              {/* CONDITIONAL Cell for Option 2 (e.g., "S") */}
-                              {variations.length === 2 && (
-                                <td>{row.option2Name}</td>
-                              )}
-
-                              {/* Price Input */}
-                              <td>
-                                <input 
-                                  type="number"
-                                  value={row.price}
-                                  onChange={(e) => handleTableInputChange(e, rowIndex, 'price')}
-                                  placeholder="e.g., 25.50"
-                                  step="0.01"
-                                  min="0"
-                                  required
-                                />
-                              </td>
-                              
-                              {/* Stock Input */}
-                              <td>
-                                <input 
-                                  type="number"
-                                  value={row.stock}
-                                  onChange={(e) => handleTableInputChange(e, rowIndex, 'stock')}
-                                  placeholder="e.g., 100"
-                                  step="1"
-                                  min="0"
-                                  required
-                                />
-                              </td>
-
-                              {/* SKU Input */}
-                              <td>
-                                <input 
-                                  type="text"
-                                  value={row.sku}
-                                  onChange={(e) => handleTableInputChange(e, rowIndex, 'sku')}
-                                  placeholder="e.g., TSHIRT-BLK-S"
-                                  required
-                                />
-                              </td>
-
-                              {/* Image Placeholder */}
-                              <td>
-                                <div className="placeholder-image-uploader" title="Add variation image">
-                                  +
-                                </div>
-                              </td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-                  )}
-                {/* === END: Variation List Table === */}
+            {variationTableData.length > 0 && variations.length === 1 && (
+              <div className="variation-table-container">
+                <table className="variation-table">
+                  <thead>
+                    <tr>
+                      <th>{variations[0].name || 'Variation'}</th>
+                      <th>Price (RM) *</th>
+                      <th>Stock Quantity *</th>
+                      <th>SKU *</th>
+                      <th>Image</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {variationTableData.map((row, rowIndex) => (
+                      <tr key={row.id}>
+                        <td>{row.optionName}</td>
+                        <td>
+                          <input type="number" value={row.price} onChange={(e) => handleTableInputChange(e, rowIndex, 'price')} placeholder="e.g., 25.50" step="0.01" min="0" />
+                        </td>
+                        <td>
+                          <input type="number" value={row.stock} onChange={(e) => handleTableInputChange(e, rowIndex, 'stock')} placeholder="e.g., 100" step="1" min="0" />
+                        </td>
+                        <td>
+                          <input type="text" value={row.sku} onChange={(e) => handleTableInputChange(e, rowIndex, 'sku')} placeholder="e.g., TSHIRT-RED" />
+                        </td>
+                        <td>
+                          <div className="placeholder-image-uploader" title="Add variation image">+</div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
             
             {variations.length < 2 && (
               <div className="form-group">
