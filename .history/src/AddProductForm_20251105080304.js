@@ -738,7 +738,7 @@ function AddProductForm({
         {/* --- UPDATED: Publish Button --- */}
         <button 
           type="button" 
-          onClick={handleSubmit} // Link to updated handler (which you already fixed)
+          onClick={handleSubmit} // Link to updated handler
           className="button button-primary"
           disabled={isSubmitting} // Disable when submitting
         >

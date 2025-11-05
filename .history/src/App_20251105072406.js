@@ -31,18 +31,10 @@ function App() {
   
   // --- NEW State for active tab ---
   const [activeSection, setActiveSection] = useState('basic-info-section');
-  // --- END NEW ---
-
-  // --- ADD: API Info --- 
+  // --- ADD THESE NEW CONSTANTS ---
   const apiBaseUrl = 'http://localhost/taptosell.my/wp-json/taptosell/v1';
   const username = '01moynul'; // <-- Your WordPress username
   const applicationPassword = 'cdcB 77WT AYOD PLdd IPkz 7azB'; // <-- Your Application Password
-
-  // Create a reusable headers object
-  const apiAuthHeaders = new Headers();
-  apiAuthHeaders.set('Authorization', 'Basic ' + btoa(username + ':' + applicationPassword));
-  apiAuthHeaders.set('Content-Type', 'application/json'); // We'll need this for POST requests
-  // --- END ADD ---
 
   /**
    * useEffect Hook to fetch categories - kept in App.js
@@ -136,10 +128,6 @@ function App() {
         <div className="layout-column form-column">
           {/* Render the AddProductForm component, passing ALL state and setters */}
           <AddProductForm
-            // --- Pass API Info ---
-            apiBaseUrl={apiBaseUrl}
-            apiAuthHeaders={apiAuthHeaders}
-
             // Pass categories (already doing this)
             categories={categories}
 

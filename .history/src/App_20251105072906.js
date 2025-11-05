@@ -31,9 +31,7 @@ function App() {
   
   // --- NEW State for active tab ---
   const [activeSection, setActiveSection] = useState('basic-info-section');
-  // --- END NEW ---
-
-  // --- ADD: API Info --- 
+  // --- ADD THESE NEW CONSTANTS ---
   const apiBaseUrl = 'http://localhost/taptosell.my/wp-json/taptosell/v1';
   const username = '01moynul'; // <-- Your WordPress username
   const applicationPassword = 'cdcB 77WT AYOD PLdd IPkz 7azB'; // <-- Your Application Password

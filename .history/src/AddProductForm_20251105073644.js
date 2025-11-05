@@ -1,7 +1,7 @@
 //
 // File: src/AddProductForm.js (Corrected Version)
 //
-import React, { useEffect, useState } from 'react'; // Import useEffect AND useState
+import React, { useEffect } from 'react'; // Import useEffect
 // We don't need useState or useEffect here, just 'React'
 // import './App.css'; // App.js already imports the CSS
 
@@ -295,30 +295,19 @@ function AddProductForm({
     }
   };
 
-  // ... (after the addVariationGroup function)
-
-  /**
-   * Gathers all form state into a single object for the API.
-   */
-  const gatherFormData = () => {
-    return {
-      // Basic Info
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    const productData = {
       productName: productName,
-      selectedCategory: parseInt(selectedCategory), // Ensure category ID is an integer
+      selectedCategory: selectedCategory,
       productDescription: productDescription,
       brand: brand,
-
-      // Sales Info
       price: price,
       sku: sku,
       stock: stock,
-
-      // Variations
       hasVariations: hasVariations,
-      variationConfig: hasVariations ? variations : [],
-      variationDetails: hasVariations ? variationTableData : [],
-
-      // Shipping
+      variationConfig: hasVariations ? variations : null,
+      variationDetails: hasVariations ? variationTableData : null,
       weight: weight,
       packageDimensions: {
         length: pkgLength,
@@ -326,85 +315,9 @@ function AddProductForm({
         height: pkgHeight,
       },
     };
-  };
-
-  /**
-   * Central function to send data to the API.
-   * @param {string} status - The desired post status ('draft' or 'pending').
-   */
-  const submitProduct = async (status) => {
-    // 1. Set loading state and clear old messages
-    setIsSubmitting(true);
-    setSubmitStatus({ message: '', type: '' });
-
-    // 2. Gather all form data
-    const productData = gatherFormData();
-    // Add the status to the data object
-    productData.status = status;
-
-    // Log to console for debugging
-    console.log(`Submitting product with status: ${status}`);
-    console.log("Payload:", JSON.stringify(productData, null, 2));
-
-    try {
-      // 3. Send the data to the API endpoint
-      const response = await fetch(`${apiBaseUrl}/product/create`, {
-        method: 'POST',
-        headers: apiAuthHeaders, // Use the headers from props
-        body: JSON.stringify(productData),
-      });
-
-      const result = await response.json();
-
-      // 4. Handle API error response
-      if (!response.ok) {
-        let errorMessage = result.message || `HTTP error! status: ${response.status}`;
-        // This checks if WordPress sent back specific validation errors
-        if (result.data && result.data.params) {
-          const paramErrors = Object.values(result.data.params).join(', ');
-          errorMessage = `${errorMessage} Invalid fields: ${paramErrors}`;
-        }
-        throw new Error(errorMessage);
-      }
-
-      // 5. Handle API success response
-      console.log("API Success:", result);
-      setSubmitStatus({ 
-        message: `Success! Product (ID: ${result.product_id}) saved as ${result.status}.`, 
-        type: 'success' 
-      });
-      // Scroll to the top to show the success message
-      window.scrollTo(0, 0); 
-
-    } catch (error) {
-      // 6. Handle fetch or other errors
-      console.error("API Error:", error.message);
-      setSubmitStatus({ 
-        message: `Error: ${error.message}. Please check fields and try again.`, 
-        type: 'error' 
-      });
-      // Scroll to the top to show the error message
-      window.scrollTo(0, 0);
-    } finally {
-      // 7. Always turn off loading state
-      setIsSubmitting(false);
-    }
-  };
-
-  /**
-   * Handler for the "Save and Publish" button.
-   */
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    submitProduct('pending'); // Submit for admin review
-  };
-
-  /**
-   * Handler for the "Save as Draft" button.
-   */
-  const handleSaveAsDraft = (event) => {
-    event.preventDefault();
-    submitProduct('draft'); // Save as a draft
+    console.log("Form Data Submitted (Client-Side):");
+    console.log(JSON.stringify(productData, null, 2));
+    alert('Check the console (F12) to see the gathered form data!');
   };
 
 
@@ -713,36 +626,23 @@ function AddProductForm({
       {/* --- Form Submission Button --- */}
       <div className="form-section form-actions" style={{ textAlign: 'right', borderBottom: 'none', paddingBottom: 0 }}>
         
-        {/* --- NEW: Submission Status Message --- */}
-        {submitStatus.message && (
-          <div 
-            className={`submission-status ${submitStatus.type === 'success' ? 'status-success' : 'status-error'}`}
-            style={{ textAlign: 'left', marginBottom: '15px' }}
-          >
-            {submitStatus.message}
-          </div>
-        )}
-        {/* --- END NEW --- */}
-
-        {/* --- UPDATED: Save as Draft Button --- */}
+        {/* --- NEW: Save as Draft Button --- */}
         <button 
           type="button" 
-          onClick={handleSaveAsDraft} // Link to new handler
+          // onClick={handleSaveAsDraft} // We will create this handler next
           className="button button-secondary"
-          style={{ marginRight: '10px' }}
-          disabled={isSubmitting} // Disable when submitting
+          style={{ marginRight: '10px' }} // Add some space between buttons
         >
-          {isSubmitting ? 'Saving...' : 'Save as Draft'}
+          Save as Draft
         </button>
 
-        {/* --- UPDATED: Publish Button --- */}
+        {/* --- Existing Publish Button --- */}
         <button 
           type="button" 
-          onClick={handleSubmit} // Link to updated handler (which you already fixed)
+          onClick={handleSubmit} 
           className="button button-primary"
-          disabled={isSubmitting} // Disable when submitting
         >
-          {isSubmitting ? 'Submitting...' : 'Save and Publish'}
+          Save and Publish
         </button>
       </div>
 

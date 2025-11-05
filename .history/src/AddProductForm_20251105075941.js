@@ -713,36 +713,23 @@ function AddProductForm({
       {/* --- Form Submission Button --- */}
       <div className="form-section form-actions" style={{ textAlign: 'right', borderBottom: 'none', paddingBottom: 0 }}>
         
-        {/* --- NEW: Submission Status Message --- */}
-        {submitStatus.message && (
-          <div 
-            className={`submission-status ${submitStatus.type === 'success' ? 'status-success' : 'status-error'}`}
-            style={{ textAlign: 'left', marginBottom: '15px' }}
-          >
-            {submitStatus.message}
-          </div>
-        )}
-        {/* --- END NEW --- */}
-
-        {/* --- UPDATED: Save as Draft Button --- */}
+        {/* --- NEW: Save as Draft Button --- */}
         <button 
           type="button" 
-          onClick={handleSaveAsDraft} // Link to new handler
+          // onClick={handleSaveAsDraft} // We will create this handler next
           className="button button-secondary"
-          style={{ marginRight: '10px' }}
-          disabled={isSubmitting} // Disable when submitting
+          style={{ marginRight: '10px' }} // Add some space between buttons
         >
-          {isSubmitting ? 'Saving...' : 'Save as Draft'}
+          Save as Draft
         </button>
 
-        {/* --- UPDATED: Publish Button --- */}
+        {/* --- Existing Publish Button --- */}
         <button 
           type="button" 
-          onClick={handleSubmit} // Link to updated handler (which you already fixed)
+          onClick={handleSubmit} 
           className="button button-primary"
-          disabled={isSubmitting} // Disable when submitting
         >
-          {isSubmitting ? 'Submitting...' : 'Save and Publish'}
+          Save and Publish
         </button>
       </div>
 

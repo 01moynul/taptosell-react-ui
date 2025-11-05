@@ -31,9 +31,7 @@ function App() {
   
   // --- NEW State for active tab ---
   const [activeSection, setActiveSection] = useState('basic-info-section');
-  // --- END NEW ---
-
-  // --- ADD: API Info --- 
+  // --- ADD THESE NEW CONSTANTS ---
   const apiBaseUrl = 'http://localhost/taptosell.my/wp-json/taptosell/v1';
   const username = '01moynul'; // <-- Your WordPress username
   const applicationPassword = 'cdcB 77WT AYOD PLdd IPkz 7azB'; // <-- Your Application Password
@@ -136,10 +134,12 @@ function App() {
         <div className="layout-column form-column">
           {/* Render the AddProductForm component, passing ALL state and setters */}
           <AddProductForm
-            // --- Pass API Info ---
+
+            // --- ADD THESE TWO NEW PROPS ---
             apiBaseUrl={apiBaseUrl}
             apiAuthHeaders={apiAuthHeaders}
-
+            // --- END ADD ---
+            
             // Pass categories (already doing this)
             categories={categories}
 
