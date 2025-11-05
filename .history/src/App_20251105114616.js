@@ -1,7 +1,7 @@
 //
 // File: src/App.js (Corrected Version)
 //
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import './App.css';
 import AddProductForm from './AddProductForm';
 import ProductPreview from './ProductPreview'; 
@@ -40,49 +40,44 @@ function App() {
   const apiBaseUrl = window.taptosell_react_data?.api_url || 'http://localhost/taptosell.my/wp-json/taptosell/v1';
   const apiNonce = window.taptosell_react_data?.nonce || null; // This is the security token
   
-  // 2. Create a reusable headers object, wrapped in useMemo
-  const apiAuthHeaders = useMemo(() => {
-    const headers = new Headers();
-    headers.set('Content-Type', 'application/json'); // For POST requests
+  // 2. Create a reusable headers object
+  const apiAuthHeaders = new Headers();
+  apiAuthHeaders.set('Content-Type', 'application/json'); // For POST requests
 
-    // 3. Use the NONCE for authentication if it exists (on the live site)
-    if (apiNonce) {
-      headers.set('X-WP-Nonce', apiNonce);
-    } else {
-      // 4. Fallback to Basic Auth if nonce doesn't exist (for localhost:3000 development)
-      const username = '01moynul';
-      const applicationPassword = 'cdcB 77WT AYOD PLdd IPkz 7azB';
-      headers.set('Authorization', 'Basic ' + btoa(username + ':' + applicationPassword));
-    }
-    return headers;
-  }, [apiNonce]); // The hook will only re-run if apiNonce changes
+  // 3. Use the NONCE for authentication if it exists (on the live site)
+  if (apiNonce) {
+    apiAuthHeaders.set('X-WP-Nonce', apiNonce);
+  } else {
+    // 4. Fallback to Basic Auth if nonce doesn't exist (for localhost:3000 development)
+    const username = '01moynul';
+    const applicationPassword = 'cdcB 77WT AYOD PLdd IPkz 7azB';
+    apiAuthHeaders.set('Authorization', 'Basic ' + btoa(username + ':' + applicationPassword));
+  }
   // --- END NEW ---
 
-/**
+  /**
    * useEffect Hook to fetch categories - kept in App.js
    */
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        // --- UPDATED ---
-        // We create a *copy* of the headers...
-        const getHeaders = new Headers(apiAuthHeaders);
-        // ...and remove 'Content-Type' just for this GET request.
-        getHeaders.delete('Content-Type');
+        const username = '01moynul'; // <-- REPLACE THIS if needed
+        const applicationPassword = 'cdcB 77WT AYOD PLdd IPkz 7azB'; // <-- REPLACE THIS if needed
+        const headers = new Headers();
+        headers.set('Authorization', 'Basic ' + btoa(username + ':' + applicationPassword));
 
-        // We use the new 'apiBaseUrl' constant
-        const response = await fetch(`${apiBaseUrl}/product/categories`, {
+        const response = await fetch('http://localhost/taptosell.my/wp-json/taptosell/v1/product/categories', {
           method: 'GET',
-          headers: getHeaders, // Use the new, clean headers
+          headers: headers,
         });
-        // --- END UPDATE ---
 
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
         const data = await response.json();
         
-        // This part is the same
+        // API returns [{term_id: 1, name: '...'}, ...]
+        // Let's transform it to the format our form expects {id: 1, name: '...'}
         const formattedCategories = data.map(category => ({
           id: category.term_id, // Use 'id'
           name: category.name
@@ -97,7 +92,7 @@ function App() {
       }
     };
     fetchCategories();
-  }, [apiAuthHeaders, apiBaseUrl]); // <-- We also add our new constants to the dependency array
+  }, []);
 
   // --- Render Logic ---
   // Loading and Error states are handled here

@@ -40,22 +40,19 @@ function App() {
   const apiBaseUrl = window.taptosell_react_data?.api_url || 'http://localhost/taptosell.my/wp-json/taptosell/v1';
   const apiNonce = window.taptosell_react_data?.nonce || null; // This is the security token
   
-  // 2. Create a reusable headers object, wrapped in useMemo
-  const apiAuthHeaders = useMemo(() => {
-    const headers = new Headers();
-    headers.set('Content-Type', 'application/json'); // For POST requests
+  // 2. Create a reusable headers object
+  const apiAuthHeaders = new Headers();
+  apiAuthHeaders.set('Content-Type', 'application/json'); // For POST requests
 
-    // 3. Use the NONCE for authentication if it exists (on the live site)
-    if (apiNonce) {
-      headers.set('X-WP-Nonce', apiNonce);
-    } else {
-      // 4. Fallback to Basic Auth if nonce doesn't exist (for localhost:3000 development)
-      const username = '01moynul';
-      const applicationPassword = 'cdcB 77WT AYOD PLdd IPkz 7azB';
-      headers.set('Authorization', 'Basic ' + btoa(username + ':' + applicationPassword));
-    }
-    return headers;
-  }, [apiNonce]); // The hook will only re-run if apiNonce changes
+  // 3. Use the NONCE for authentication if it exists (on the live site)
+  if (apiNonce) {
+    apiAuthHeaders.set('X-WP-Nonce', apiNonce);
+  } else {
+    // 4. Fallback to Basic Auth if nonce doesn't exist (for localhost:3000 development)
+    const username = '01moynul';
+    const applicationPassword = 'cdcB 77WT AYOD PLdd IPkz 7azB';
+    apiAuthHeaders.set('Authorization', 'Basic ' + btoa(username + ':' + applicationPassword));
+  }
   // --- END NEW ---
 
 /**

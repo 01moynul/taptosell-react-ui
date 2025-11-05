@@ -304,7 +304,7 @@ function AddProductForm({
     return {
       // Basic Info
       productName: productName,
-      selectedCategory: selectedCategory, // Ensure category ID is an integer
+      selectedCategory: parseInt(selectedCategory), // Ensure category ID is an integer
       productDescription: productDescription,
       brand: brand,
 
